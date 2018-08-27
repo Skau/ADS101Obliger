@@ -4,6 +4,7 @@
 
 int main()
 {
+    // Both my version and the stl one work the exact same way with the functions below
     ADS101::stack<float> stack;
     //std::stack<float> stack;
 
