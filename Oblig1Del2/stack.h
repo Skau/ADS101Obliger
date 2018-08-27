@@ -1,10 +1,12 @@
 #ifndef STACK_H
 #define STACK_H
 
+#include <utility>
 
 // This header contains the node which hold the data, and the stack which holds all the functions and a pointer to the the top node
 // All nodes hold the pointer to the next node.
-// They are both templated to allow any type (well most anyway - std::string does not work out of the box, but const char* does)
+// I implemented the whole rule of five because I wanted to also make this stack compatible with std::string, which I found out
+// needed the rule of three, and not implementing the additional move constructor/assignement operator is a missed optimization opportunity.
 namespace ADS101
 {
 template <typename T>
@@ -23,16 +25,44 @@ template <typename T>
 class stack
 {
 public:
-    stack()
+    // Default constructor
+    stack() : m_size{0}, m_first{nullptr}
     {
-        m_size = 0;
-        m_first = new node<T>();
+    }
+
+    // Copy constructor
+    stack(const stack& other) : m_size{other.m_size}, m_first{other.m_first}
+    {
+    }
+
+    // Move constructor
+    stack(stack&& other): m_size {std::move(other.m_size)}, m_first{std::move(other.m_first)}
+    {
     }
 
     // The clear function is called in the destructor, so main works with both std::stack and my version
     ~stack()
     {
         clear();
+    }
+
+    // Copy assignment operator
+    stack& operator=(const stack& other)
+    {
+        if(this != other)
+        {
+            m_first = other.m_first;
+            m_size = other.m_size;
+        }
+        return *this;
+    }
+
+    // Move assignment operator
+    stack operator=(stack&& other)
+    {
+        m_first = std::move(other.m_first);
+        m_size = std::move(other.m_size);
+        return *this;
     }
 
     // Adds a new node the the top

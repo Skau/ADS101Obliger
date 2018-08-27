@@ -5,13 +5,13 @@
 int main()
 {
     // Both my version and the stl one work the exact same way with the functions below
-    ADS101::stack<float> stack;
-    //std::stack<float> stack;
+    ADS101::stack<std::string> stack;
+    //std::stack<std::string> stack;
 
-    stack.push(2.5);
-    stack.push(3.5);
-    stack.push(4.5);
-    stack.push(5.5);
+    stack.push("2.5");
+    stack.push("3.5");
+    stack.push("4.5");
+    stack.push("5.5");
 
     std::cout << "Top: " << stack.top() << std::endl;
     std::cout << "Size: " << stack.size() << std::endl;
@@ -32,6 +32,13 @@ int main()
 
     std::cout << "Top: " << stack.top() << std::endl;
     std::cout << "Size: " << stack.size() << std::endl;
+    std::cout << "\n";
+
+    ADS101::stack<std::string> stack2 = stack;
+    //std::stack<std::string> stack2 = stack;
+
+    std::cout << "stack2: Top: " << stack.top() << std::endl;
+    std::cout << "stack2: Size: " << stack.size() << std::endl;
 
     std::cin.get();
     return 0;
