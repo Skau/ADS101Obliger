@@ -64,52 +64,20 @@ void MainWindow::sort()
     QString qString = m_textEdit->toPlainText();
     auto vector = stringToVector(qString.toStdString());
 
+    // Sort the vector
+    bubbleSort(vector);
 
-    // Bubble sort with break on the vector (order depends on which radio button is toggled)
-    int n = vector.size();
-    int temp = 0;
-    bool swapped;
-    for(int i = 0;  i < n - 1; i++)
-    {
-        swapped = false;
-        for(int j = 0; j < n - i - 1; j++)
-        {
-            if(m_ascendingButton->isChecked())
-            {
-                if(vector[j] < vector[j+1])
-                {
-                    temp = vector[j].getData();
-                    vector[j] = vector[j+1];
-                    vector[j+1] = temp;
-                    swapped = true;
-                }
-            }
-            else
-            {
-                if(vector[j] > vector[j+1])
-                {
-                    temp = vector[j].getData();
-                    vector[j] = vector[j+1];
-                    vector[j+1] = temp;
-                    swapped = true;
-                }
-            }
-        }
-        // Break if inner loop never swapped (vector is sorted)
-        if(!swapped)
-        {
-            break;
-        }
-    }
+    // Convert the vector back into a string
+    auto string = vectorToString(vector);
 
-    // Convert the vector back to a string and output in sorted text editor
-    auto stringToShow = qString.fromStdString(vectorToString(vector));
+    // Output in sorted text editor
+    auto stringToShow = qString.fromStdString(string);
     m_sortedTextEdit->clear();
     m_sortedTextEdit->setText(stringToShow);
 }
 
-// Converts a given string to a vector of objects holding the data
-std::vector<Object> MainWindow::stringToVector(std::string stringToConvert)
+// Converts a given string to a vector of Object holding the data
+std::vector<Object> MainWindow::stringToVector(const std::string& stringToConvert)
 {
     std::vector<Object> v;
 
@@ -124,8 +92,48 @@ std::vector<Object> MainWindow::stringToVector(std::string stringToConvert)
     return v;
 }
 
+void MainWindow::bubbleSort(std::vector<Object>& vector)
+{
+    int n = vector.size();
+    int temp = 0;
+    bool swapped;
+    for(int i = 0;  i < n - 1; i++)
+    {
+        swapped = false;
+        for(int j = 0; j < n - i - 1; j++)
+        {
+            if(m_ascendingButton->isChecked())
+            {
+                if(vector[j] < vector[j+1])
+                {
+                    // Overloaded operator() to return m_data in object
+                    temp = vector[j]();
+                    vector[j] = vector[j+1];
+                    vector[j+1] = temp;
+                    swapped = true;
+                }
+            }
+            else
+            {
+                if(vector[j] > vector[j+1])
+                {
+                    temp = vector[j]();
+                    vector[j] = vector[j+1];
+                    vector[j+1] = temp;
+                    swapped = true;
+                }
+            }
+        }
+        // Break if inner loop never swapped (vector is sorted)
+        if(!swapped)
+        {
+            break;
+        }
+    }
+}
+
 // Converts a given vector of objects to a string ready to be outputted
-std::string MainWindow::vectorToString(std::vector<Object> vectorToConvert)
+std::string MainWindow::vectorToString(const std::vector<Object> &vectorToConvert)
 {
     std::stringstream ss;
 

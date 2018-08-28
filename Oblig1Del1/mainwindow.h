@@ -27,15 +27,16 @@ protected:
 
 private:
 
-    std::vector<Object>stringToVector(std::string stringToConvert);
+    std::vector<Object>stringToVector(const std::string &stringToConvert);
 
-    std::string vectorToString(std::vector<Object> vectorToConvert);
+    std::string vectorToString(const std::vector<Object>& vectorToConvert);
 
     QTextEdit* m_textEdit;
     QTextEdit* m_sortedTextEdit;
     QPushButton* m_sortButton;
     QRadioButton* m_ascendingButton;
     QRadioButton* m_descendingButton;
+    void bubbleSort(std::vector<Object>& vector);
 };
 
 #endif
