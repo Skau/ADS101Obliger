@@ -65,31 +65,40 @@ void MainWindow::sort()
     auto vector = stringToVector(qString.toStdString());
 
 
-    // Sort the vector (order depends on which radio button is toggled)
+    // Bubble sort with break on the vector (order depends on which radio button is toggled)
     int n = vector.size();
     int temp = 0;
+    bool swapped;
     for(int i = 0;  i < n - 1; i++)
     {
-        for(int j = i + 1; j < n; j++)
+        swapped = false;
+        for(int j = 0; j < n - i - 1; j++)
         {
             if(m_ascendingButton->isChecked())
             {
-                if(vector[j] < vector[i])
+                if(vector[j] < vector[j+1])
                 {
-                    temp = vector[i].getData();
-                    vector[i] = vector[j];
-                    vector[j] = temp;
+                    temp = vector[j].getData();
+                    vector[j] = vector[j+1];
+                    vector[j+1] = temp;
+                    swapped = true;
                 }
             }
             else
             {
-                if(vector[j] > vector[i])
+                if(vector[j] > vector[j+1])
                 {
-                    temp = vector[i].getData();
-                    vector[i] = vector[j];
-                    vector[j] = temp;
+                    temp = vector[j].getData();
+                    vector[j] = vector[j+1];
+                    vector[j+1] = temp;
+                    swapped = true;
                 }
             }
+        }
+        // Break if inner loop never swapped (vector is sorted)
+        if(!swapped)
+        {
+            break;
         }
     }
 
