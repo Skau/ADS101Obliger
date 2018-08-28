@@ -3,17 +3,16 @@
 
 #include <ostream>
 
+template <typename T>
 class Object
 {
 public:
     // Constructor
-    Object(int data) :  m_data{ data }
+    Object(T data) :  m_data{ data }
     {
     }
 
     //***** Overloads *****//
-
-
 
     bool operator<(const Object& other)
     {
@@ -32,20 +31,18 @@ public:
     }
 
     // These last two are here so that it's easier to use during sorting
-    void operator=(int data)
+    void operator=(T data)
     {
         m_data = data;
     }
 
-    int operator()()
+    T operator()()
     {
         return m_data;
     }
 
-
-
 private:
-    int m_data;
+    T m_data;
 };
 
 #endif // OBJECT_H

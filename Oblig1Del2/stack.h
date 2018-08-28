@@ -1,19 +1,17 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <utility>
+// This header contains the node which hold the data, and the stack which holds all the functionality and a pointer to the top node.
+// A node holds a pointer to the next node.
+// Templated to allow any type.
 
-// This header contains the node which hold the data, and the stack which holds all the functions and a pointer to the the top node
-// All nodes hold the pointer to the next node.
-// I implemented the whole rule of five because I wanted to also make this stack compatible with std::string, which I found out
-// needed the rule of three, and not implementing the additional move constructor/assignement operator is a missed optimization opportunity.
 namespace ADS101
 {
 template <typename T>
 struct node
 {
-    node(T data = 0, node* next = nullptr)
-        : data{ data }, next{ next }
+    node(T d = 0, node* next = nullptr)
+        : data{ d }, next{ next }
     {
     }
 
@@ -30,43 +28,15 @@ public:
     {
     }
 
-    // Copy constructor
-    stack(const stack& other) : m_size{other.m_size}, m_first{other.m_first}
-    {
-    }
-
-    // Move constructor
-    stack(stack&& other): m_size {std::move(other.m_size)}, m_first{std::move(other.m_first)}
-    {
-    }
-
-    // The clear function is called in the destructor, so main works with both std::stack and my version
+    // The stl version does not have a clear function, so it's called in the destructor
+    // to make sure that the code in main.cpp works with both std::stack and my version.
     ~stack()
     {
         clear();
     }
 
-    // Copy assignment operator
-    stack& operator=(const stack& other)
-    {
-        if(this != other)
-        {
-            m_first = other.m_first;
-            m_size = other.m_size;
-        }
-        return *this;
-    }
-
-    // Move assignment operator
-    stack operator=(stack&& other)
-    {
-        m_first = std::move(other.m_first);
-        m_size = std::move(other.m_size);
-        return *this;
-    }
-
-    // Adds a new node the the top
-    void push(T const data)
+    // Adds a new node at the top
+    void push(const T& data)
     {
         // Increments the size
         m_size++;
@@ -90,7 +60,7 @@ public:
     }
 
     // Returns the top nodes' data
-    T top() const
+    T& top() const
     {
         return m_first->data;
     }
@@ -111,7 +81,7 @@ private:
     int m_size;
     node<T>* m_first;
 
-    // Declared here and called in the destructor
+    // Called in the destructor
     void clear()
     {
         while (!empty())

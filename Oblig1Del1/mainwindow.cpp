@@ -11,6 +11,8 @@ MainWindow::MainWindow() : QMainWindow()
     // Resizes the window to an appropriate size
     resize(QDesktopWidget().availableGeometry(this).size() * 0.1);
 
+    setWindowTitle("Oblig 1 Del 1");
+
     // Create the text editor for input and sorted text editor for output
     m_textEdit = new QTextEdit();
     m_sortedTextEdit = new QTextEdit();
@@ -47,8 +49,6 @@ MainWindow::MainWindow() : QMainWindow()
     widget->setLayout(layout);
     setCentralWidget(widget);
 
-    setWindowTitle("Oblig 1 Del 1");
-
     // Connecting the sort button to the sort function
     connect(m_sortButton, SIGNAL(clicked()), this, SLOT(sort()));
 }
@@ -62,7 +62,8 @@ void MainWindow::sort()
 {
     // Get a vector from the input in text editor
     QString qString = m_textEdit->toPlainText();
-    auto vector = stringToVector(qString.toStdString());
+    std::vector<Object<int>> vector;
+    stringToVector(qString.toStdString(), &vector);
 
     // Sort the vector
     bubbleSort(vector);
@@ -76,23 +77,20 @@ void MainWindow::sort()
     m_sortedTextEdit->setText(stringToShow);
 }
 
-// Converts a given string to a vector of Object holding the data
-std::vector<Object> MainWindow::stringToVector(const std::string& stringToConvert)
+// Converts a given string to a vector holding the data.
+template <typename T>
+void MainWindow::stringToVector(std::string stringToConvert, std::vector<T>* outVector)
 {
-    std::vector<Object> v;
-
     std::stringstream ss(stringToConvert);
     int temp;
-
     while(ss>>temp)
     {
-        v.push_back(Object(temp));
+        outVector->push_back(Object<int>(temp));
     }
-
-    return v;
 }
 
-void MainWindow::bubbleSort(std::vector<Object>& vector)
+template <typename T>
+void MainWindow::bubbleSort(std::vector<T>& vector)
 {
     int n = vector.size();
     int temp = 0;
@@ -104,9 +102,9 @@ void MainWindow::bubbleSort(std::vector<Object>& vector)
         {
             if(m_ascendingButton->isChecked())
             {
-                if(vector[j] < vector[j+1])
+                if(vector[j] > vector[j+1])
                 {
-                    // Overloaded operator() to return m_data in object
+                    // Overloaded operator() to return m_data in object (cleaner than a getter function in my opinion)
                     temp = vector[j]();
                     vector[j] = vector[j+1];
                     vector[j+1] = temp;
@@ -115,7 +113,7 @@ void MainWindow::bubbleSort(std::vector<Object>& vector)
             }
             else
             {
-                if(vector[j] > vector[j+1])
+                if(vector[j] < vector[j+1])
                 {
                     temp = vector[j]();
                     vector[j] = vector[j+1];
@@ -133,7 +131,8 @@ void MainWindow::bubbleSort(std::vector<Object>& vector)
 }
 
 // Converts a given vector of objects to a string ready to be outputted
-std::string MainWindow::vectorToString(const std::vector<Object> &vectorToConvert)
+template <typename T>
+std::string MainWindow::vectorToString(const std::vector<T> &vectorToConvert)
 {
     std::stringstream ss;
 

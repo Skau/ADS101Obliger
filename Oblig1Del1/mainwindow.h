@@ -27,16 +27,22 @@ protected:
 
 private:
 
-    std::vector<Object>stringToVector(const std::string &stringToConvert);
-
-    std::string vectorToString(const std::vector<Object>& vectorToConvert);
-
     QTextEdit* m_textEdit;
     QTextEdit* m_sortedTextEdit;
     QPushButton* m_sortButton;
     QRadioButton* m_ascendingButton;
     QRadioButton* m_descendingButton;
-    void bubbleSort(std::vector<Object>& vector);
+
+    // Cannot return templated vector, as it cannot be deduced by the compiler.
+    // Instead an out parameter is used.
+    template <typename T>
+    void stringToVector(std::string stringToConvert, std::vector<T>* outVector);
+
+    template <typename T>
+    std::string vectorToString(const std::vector<T> &vectorToConvert);
+
+    template <typename T>
+    void bubbleSort(std::vector<T> &vector);
 };
 
 #endif
