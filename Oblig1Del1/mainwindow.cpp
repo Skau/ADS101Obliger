@@ -1,6 +1,5 @@
 #include <QtWidgets>
 #include <QDebug>
-#include <algorithm>
 #include <sstream>
 #include <string>
 #include "mainWindow.h"
