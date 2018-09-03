@@ -17,7 +17,7 @@ MainWindow::MainWindow() : QMainWindow()
     m_sortedTextEdit = new QTextEdit();
 
     // Example text that pops up when program starts
-    QString text("b c d a e f i");
+    QString text("p o u n f d s u i e");
     m_textEdit->setPlainText(text);
 
     // To disable editing the output window
@@ -72,6 +72,7 @@ void MainWindow::sortClicked()
     // Output in sorted text editor
     m_sortedTextEdit->clear();
     m_sortedTextEdit->setText(QString::fromStdString(string));
+
 }
 
 // Converts a given string to a vector holding the data.
