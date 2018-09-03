@@ -18,7 +18,7 @@ public:
     ~MainWindow() = default;
 
 public slots:
-    void sort();
+    void sortClicked();
     void close();
 
 signals:
@@ -36,7 +36,7 @@ private:
     // Cannot return templated vector, as it cannot be deduced by the compiler.
     // Instead an out parameter is used.
     template <typename T>
-    void stringToVector(std::string stringToConvert, std::vector<T>* outVector);
+    std::vector<T>& stringToVector(std::string stringToConvert);
 
     template <typename T>
     std::string vectorToString(const std::vector<T> &vectorToConvert);

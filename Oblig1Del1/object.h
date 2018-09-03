@@ -8,7 +8,7 @@ class Object
 {
 public:
     // Constructor
-    Object(T data) :  m_data{ data }
+    Object(T d) :  m_data{ d }
     {
     }
 

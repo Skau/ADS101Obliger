@@ -4,7 +4,6 @@
 
 int main()
 {
-    // Both my version and the stl one work the exact same way with the functions below
     ADS101::stack<std::string> stack;
     //std::stack<std::string> stack;
 

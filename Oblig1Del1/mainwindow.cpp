@@ -17,27 +17,27 @@ MainWindow::MainWindow() : QMainWindow()
     m_sortedTextEdit = new QTextEdit();
 
     // Example text that pops up when program starts
-    QString text("7 3 4 2 8 9 3 2 1 4");
+    QString text("b c d a e f i");
     m_textEdit->setPlainText(text);
 
     // To disable editing the output window
     m_sortedTextEdit->setEnabled(false);
 
-    // The button that will output the sorted text
+    // The button that will start the sort
     m_sortButton = new QPushButton("Sort");
 
-    // Radio buttons to toggle between ascending and descending sort
+    // Radio buttons to toggle between ascending and descending sort defaulted to ascending
     m_ascendingButton = new QRadioButton("Ascending");
     m_ascendingButton->setChecked(true);
     m_descendingButton = new QRadioButton("Descending");
 
-    // The layout to line up the buttons
+    // The layout to line up the buttons horizontally
     QHBoxLayout* hBoxLayout = new QHBoxLayout();
     hBoxLayout->addWidget(m_sortButton);
     hBoxLayout->addWidget(m_ascendingButton);
     hBoxLayout->addWidget(m_descendingButton);
 
-    // The layout to vertically align the editors and button layout
+    // The layout to vertically align the editors and button layout vertically
     QVBoxLayout* layout = new QVBoxLayout;
     layout->addWidget(m_textEdit);
     layout->addWidget(m_sortedTextEdit);
@@ -49,7 +49,7 @@ MainWindow::MainWindow() : QMainWindow()
     setCentralWidget(widget);
 
     // Connecting the sort button to the sort function
-    connect(m_sortButton, SIGNAL(clicked()), this, SLOT(sort()));
+    connect(m_sortButton, SIGNAL(clicked()), this, SLOT(sortClicked()));
 }
 
 void MainWindow::close()
@@ -57,12 +57,11 @@ void MainWindow::close()
     QMainWindow::close();
 }
 
-void MainWindow::sort()
+void MainWindow::sortClicked()
 {
     // Get a vector from the input in text editor
     QString qString = m_textEdit->toPlainText();
-    std::vector<Object<int>> vector;
-    stringToVector(qString.toStdString(), &vector);
+    auto vector = stringToVector<Object<char>>(qString.toStdString());
 
     // Sort the vector
     bubbleSort(vector);
@@ -71,21 +70,22 @@ void MainWindow::sort()
     auto string = vectorToString(vector);
 
     // Output in sorted text editor
-    auto stringToShow = qString.fromStdString(string);
     m_sortedTextEdit->clear();
-    m_sortedTextEdit->setText(stringToShow);
+    m_sortedTextEdit->setText(QString::fromStdString(string));
 }
 
 // Converts a given string to a vector holding the data.
 template <typename T>
-void MainWindow::stringToVector(std::string stringToConvert, std::vector<T>* outVector)
+std::vector<T>& MainWindow::stringToVector(std::string stringToConvert)
 {
     std::stringstream ss(stringToConvert);
-    int temp;
+    auto v = new std::vector<Object<char>>();
+    char temp;
     while(ss>>temp)
     {
-        outVector->push_back(Object<int>(temp));
+        v->push_back(temp);
     }
+    return *v;
 }
 
 template <typename T>
@@ -103,7 +103,6 @@ void MainWindow::bubbleSort(std::vector<T>& vector)
             {
                 if(vector[j] > vector[j+1])
                 {
-                    // Overloaded operator() to return m_data in object (cleaner than a getter function in my opinion)
                     temp = vector[j]();
                     vector[j] = vector[j+1];
                     vector[j+1] = temp;
@@ -121,7 +120,7 @@ void MainWindow::bubbleSort(std::vector<T>& vector)
                 }
             }
         }
-        // Break if inner loop never swapped (vector is sorted)
+        // Break if inner loop never swapped (vector is finished sorting before reaching the end)
         if(!swapped)
         {
             break;

@@ -1,6 +1,5 @@
 #ifndef STACK_H
 #define STACK_H
-
 // This header contains the node which hold the data, and the stack which holds all the functionality and a pointer to the top node.
 // A node holds a pointer to the next node.
 // Templated to allow any type.
