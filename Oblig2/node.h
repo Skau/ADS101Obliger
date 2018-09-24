@@ -15,15 +15,32 @@ public:
 
     void remove(int data);
 
+    Node* find(int data);
+
     void replaceNode(int dataToReplace, int replacementData);
 
     int data() { return mData; }
 
 private:
-    void removeNode(int data, Node* node);
+    void remove(Node& Comparable, Node* node);
 
     Node* findMin(Node* node);
     Node* findMax(Node* node);
+
+    bool operator==(const Node& node)
+    {
+        return mData == node.mData;
+    }
+
+    bool operator<(const Node& node)
+    {
+        return mData < node.mData;
+    }
+
+    bool operator>(const Node& node)
+    {
+        return mData < node.mData;
+    }
 
     int mData;
     Node* leftSub;

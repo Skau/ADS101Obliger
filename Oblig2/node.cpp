@@ -42,54 +42,77 @@ void Node::intrav()
 
 void Node::remove(int data)
 {
-    std::cout << "Removing " << data << std::endl;
-    removeNode(data, this);
+//    Node* nodeToRemove = find(data);
+//    if(nodeToRemove)
+//    {
+//        std::cout << "Removing " << nodeToRemove->mData << std::endl;
+//    }
+//    else
+//    {
+//        std::cout << "Did not find node\n" << std::endl;
+//        return;
+//    }
+    remove(*new Node(data), this);
 }
 
-void Node::removeNode(int data, Node* node)
+Node *Node::find(int data)
+{
+    if(data == mData)
+    {
+        return this;
+    }
+
+    if(leftSub)
+    {
+       return leftSub->find(data);
+    }
+
+    if(rightSub)
+    {
+       return rightSub->find(data);
+    }
+    return nullptr;
+}
+
+void Node::remove(Node& comparable, Node* node)
 {
     if(node == nullptr)
     {
+        std::cout << "Return\n";
         return;
     }
     // if data is smaller - go to left subtree
-    if(data < node->data())
+    if(&comparable < node)
     {
-        removeNode(data, node->leftSub);
+        remove(comparable, node->leftSub);
     }
     // if data is greater - go to right subtree
-    else if(data > node->data())
+    else if(&comparable > node)
     {
-        removeNode(data, node->rightSub);
+        remove(comparable, node->rightSub);
     }
     // if two children - find smallest in right subtree
     else if(node->leftSub && node->rightSub)
     {
-        int minData = findMin(node->rightSub)->data();
-        removeNode(minData, node->rightSub);
-
+        Node* minNode = findMin(node->rightSub);
+        if(minNode)
+        {
+            std::cout << "minNode: " << minNode->mData << std::endl;;
+            remove(*minNode, node->rightSub);
+        }
+        else
+        {
+            std::cout << "Return\n";
+            return;
+        }
     }
     else
     {
+        auto oldNode = node;
 
+        node = ( node->leftSub ) ? node->leftSub : node->rightSub;
 
-
-//        node->parent->leftSub = ( node->leftSub ) ? node->leftSub : node->rightSub;
-//        node->parent->leftSub = node->rightSub;
-
-        if(node->leftSub)
-        {
-            leftSub = node->leftSub;
-        }
-
-        if(node->rightSub)
-        {
-            rightSub = node->rightSub;
-        }
-
-        node = nullptr;
-
-//        delete tempNode;
+        delete oldNode;
     }
 }
 

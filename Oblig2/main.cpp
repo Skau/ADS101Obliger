@@ -18,7 +18,7 @@ int main()
     rot->intrav();
     std::cout << std::endl;
 
-    rot->remove(4);
+    rot->remove(6);
 
     rot->intrav();
     std::cout << std::endl;
