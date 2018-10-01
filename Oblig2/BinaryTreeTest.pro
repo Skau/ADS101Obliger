@@ -18,4 +18,6 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    node.h
+    stack.h \
+    treenode.h \
+    queue.h

@@ -2,15 +2,18 @@
 #define NODE_H
 
 #include <iostream>
+#include "stack.h"
+#include "queue.h"
 
-namespace ADS101 {
+namespace ADS101
+{
 
 template <typename T>
-class Node
+class treeNode
 {
 public:
     // Constructor takes a data of some type
-    Node(T data) : mData{ data }, left{nullptr}, right{nullptr}
+    treeNode(T data) : mData{ data }, left{nullptr}, right{nullptr}
     {
     }
 
@@ -25,7 +28,7 @@ public:
             }
             else
             {
-                left = new Node(data);
+                left = new treeNode(data);
             }
         }
         else
@@ -36,7 +39,7 @@ public:
             }
             else
             {
-                right = new Node(data);
+                right = new treeNode(data);
             }
         }
     }
@@ -47,7 +50,7 @@ public:
     {
         if(exists(this, data))
         {
-            std::cout << "Remvoing " << data << std::endl;
+            std::cout << "Removing " << data << std::endl;
             remove(this, data);
         }
         else
@@ -70,7 +73,7 @@ public:
         {
             if(left->data() == data)
             {
-                auto replacementNode = new Node(replacementData);
+                auto replacementNode = new treeNode(replacementData);
                 replacementNode->left = left->left;
                 replacementNode->right = left->right;
                 left = nullptr;
@@ -86,7 +89,7 @@ public:
         {
             if(right->data() == data)
             {
-                auto replacementNode = new Node(replacementData);
+                auto replacementNode = new treeNode(replacementData);
                 replacementNode->left = right->left;
                 replacementNode->right = right->right;
                 right = nullptr;
@@ -100,49 +103,97 @@ public:
     }
 
     // Prints tree using recursive preorder traversal
-    void printRecursivePreorderTraversal()
+    void printRecursivePreorder()
     {
         std::cout << mData << " ";
 
         if(left)
-            left->printRecursivePreorderTraversal();
+            left->printRecursivePreorder();
 
         if(right)
-            right->printRecursivePreorderTraversal();
+            right->printRecursivePreorder();
     }
 
-
     // Prints tree using recursive inorder traversal
-    void printRecursiveInorderTraversal()
+    void printRecursiveInorder()
     {
         if(left)
-            left->printRecursiveInorderTraversal();
+            left->printRecursiveInorder();
 
         std::cout << mData << " ";
 
         if(right)
-            right->printRecursiveInorderTraversal();
+            right->printRecursiveInorder();
+    }
+
+    // Prints inorder traversal using a stack
+    void printNonRecursiveInorder()
+    {
+        ADS101::stack<treeNode*> stack;
+        auto currentNode  = this;
+
+        while(currentNode || !stack.empty())
+        {
+            while(currentNode)
+            {
+                stack.push(currentNode);
+                currentNode = currentNode->left;
+            }
+
+            currentNode = stack.top();
+            stack.pop();
+
+            std::cout << currentNode->mData << " ";
+
+            currentNode =  currentNode->right;
+        }
+
     }
 
     // Prints tree using recursive postorder traversal
-    void printRecursivePostorderTraversal()
+    void printRecursivePostorder()
     {
         if(left)
-            left->printRecursivePostorderTraversal();
+            left->printRecursivePostorder();
 
         if(right)
-            right->printRecursivePostorderTraversal();
+            right->printRecursivePostorder();
 
         std::cout << mData << " ";
     }
 
-    // Prints tree using breadth-first level order traversal
-    void printLevelOrderTraversal()
+    // Prints tree using a recursive breadth-first level order traversal
+    void printRecursiveLevelOrder()
     {
         int h = height();
         for(int i = 1; i <= h; i++)
         {
+            std::cout << "Depth " << i << ": ";
             printLevel(i);
+            if(i != h)
+            std::cout << std::endl;
+        }
+    }
+
+    // Prints the tree using a non recursive breadth first traversal using queue
+    void printNonRecursiveLevelOrder()
+    {
+        auto queue = new ADS101::queue<treeNode*>();
+        queue->enqueue(this);
+
+        while(!queue->empty())
+        {
+            auto node = queue->front();
+            std::cout << node->mData << " ";
+            queue->dequeue();
+            if(node->left)
+            {
+                queue->enqueue(node->left);
+            }
+            if(node->right)
+            {
+                queue->enqueue(node->right);
+            }
         }
     }
 
@@ -150,7 +201,7 @@ public:
 
 private:
     // Returns if the given data is found
-    bool exists(Node* node, T data)
+    bool exists(treeNode* node, T data)
     {
         do
         {
@@ -172,7 +223,7 @@ private:
     }
 
     // Removes a node with the given data, node is the root node
-    Node* remove(Node* node, T data)
+    treeNode* remove(treeNode* node, T data)
     {
         if(node == nullptr)
         {
@@ -226,7 +277,7 @@ private:
     }
 
     // Returns the lowest node from the given root node
-    Node* findMin(Node* node)
+    treeNode* findMin(treeNode* node)
     {
         auto currentNode = node;
 
@@ -239,7 +290,7 @@ private:
     }
 
     // Returns the highest node from the given root node
-    Node* findMax(Node* node)
+    treeNode* findMax(treeNode* node)
     {
         auto currentNode = node;
 
@@ -272,18 +323,18 @@ private:
         {
             if(left)
             {
-                left->printLevel(level-1);
+                left->printLevel(level - 1);
             }
             if(right)
             {
-                right->printLevel(level-1);
+                right->printLevel(level - 1);
             }
         }
     }
 
     T mData;
-    Node* left;
-    Node* right;
+    treeNode* left;
+    treeNode* right;
 };
 
 }

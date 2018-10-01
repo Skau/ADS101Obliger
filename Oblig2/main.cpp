@@ -1,9 +1,9 @@
 #include <iostream>
-#include "node.h"
+#include "treenode.h"
 
 int main()
 {
-    auto root = new ADS101::Node<int>(5);
+    auto root = new ADS101::treeNode<int>(5);
 
     root->insert(7);
     root->insert(9);
@@ -15,52 +15,56 @@ int main()
     root->insert(4);
     root->insert(6);
 
-    std::cout << "Recursive preorder traversal:\n";
-    root->printRecursivePreorderTraversal();
+    std::cout << "Recursive inorder traversal:\n";
+    root->printRecursiveInorder();
     std::cout << std::endl;
 
-    std::cout << "Recursive inorder traversal:\n";
-    root->printRecursiveInorderTraversal();
+    std::cout << "Non recursive inorder traversal with stack:\n";
+    root->printNonRecursiveInorder();
+    std::cout << std::endl;
+
+    std::cout << "Recursive preorder traversal:\n";
+    root->printRecursivePreorder();
     std::cout << std::endl;
 
     std::cout << "Recursive postorder traversal:\n";
-    root->printRecursivePostorderTraversal();
+    root->printRecursivePostorder();
     std::cout << std::endl;
 
-    std::cout << "Breadth first level order traversal:\n";
-    root->printLevelOrderTraversal();
+    std::cout << "Recursive breadth first level order traversal:\n";
+    root->printRecursiveLevelOrder();
     std::cout << std::endl;
 
+    std::cout << "Non recursive breadth first level order traversal with queue:\n";
+    root->printNonRecursiveLevelOrder();
+    std::cout << std::endl;
+
+    std::cout << std::endl;
     root->remove(3);
-
-//    std::cout << "Recursive preorder traversal:\n";
-//    root->printRecursivePreorderTraversal();
-//    std::cout << std::endl;
-
-//    std::cout << "Delete 3\n";
-//    root->remove(3);
-
-//    std::cout << "Recursive preorder traversal:\n";
-//    root->printRecursivePreorderTraversal();
-//    std::cout << std::endl;
-
-//    std::cout << "Delete 4\n";
-//    root->remove(4);
-
-    std::cout << "Recursive preorder traversal:\n";
-    root->printRecursivePreorderTraversal();
     std::cout << std::endl;
 
     std::cout << "Recursive inorder traversal:\n";
-    root->printRecursiveInorderTraversal();
+    root->printRecursiveInorder();
+    std::cout << std::endl;
+
+    std::cout << "Non recursive inorder traversal with stack:\n";
+    root->printNonRecursiveInorder();
+    std::cout << std::endl;
+
+    std::cout << "Recursive preorder traversal:\n";
+    root->printRecursivePreorder();
     std::cout << std::endl;
 
     std::cout << "Recursive postorder traversal:\n";
-    root->printRecursivePostorderTraversal();
+    root->printRecursivePostorder();
     std::cout << std::endl;
 
-    std::cout << "Breadth first level order traversal:\n";
-    root->printLevelOrderTraversal();
+    std::cout << "Recursive breadth first level order traversal:\n";
+    root->printRecursiveLevelOrder();
+    std::cout << std::endl;
+
+    std::cout << "Non recursive breadth first level order traversal with queue:\n";
+    root->printNonRecursiveLevelOrder();
     std::cout << std::endl;
 
     return 0;
