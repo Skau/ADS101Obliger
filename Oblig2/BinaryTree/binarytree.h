@@ -1,5 +1,5 @@
-#ifndef NODE_H
-#define NODE_H
+#ifndef BINARYTREE_H
+#define BINARYTREE_H
 
 #include <iostream>
 #include "stack.h"
@@ -9,11 +9,11 @@ namespace ADS101
 {
 
 template <typename T>
-class treeNode
+class btree
 {
 public:
     // Constructor takes a data of some type
-    treeNode(T data) : mData{ data }, left{nullptr}, right{nullptr}
+    btree(T data) : mData{ data }, left{nullptr}, right{nullptr}
     {
     }
 
@@ -28,7 +28,7 @@ public:
             }
             else
             {
-                left = new treeNode(data);
+                left = new btree(data);
             }
         }
         else
@@ -39,7 +39,7 @@ public:
             }
             else
             {
-                right = new treeNode(data);
+                right = new btree(data);
             }
         }
     }
@@ -73,7 +73,7 @@ public:
         {
             if(left->data() == data)
             {
-                auto replacementNode = new treeNode(replacementData);
+                auto replacementNode = new btree(replacementData);
                 replacementNode->left = left->left;
                 replacementNode->right = left->right;
                 left = nullptr;
@@ -89,7 +89,7 @@ public:
         {
             if(right->data() == data)
             {
-                auto replacementNode = new treeNode(replacementData);
+                auto replacementNode = new btree(replacementData);
                 replacementNode->left = right->left;
                 replacementNode->right = right->right;
                 right = nullptr;
@@ -129,7 +129,7 @@ public:
     // Prints inorder traversal using a stack
     void printNonRecursiveInorder()
     {
-        ADS101::stack<treeNode*> stack;
+        ADS101::stack<btree*> stack;
         auto currentNode  = this;
 
         while(currentNode || !stack.empty())
@@ -178,7 +178,7 @@ public:
     // Prints the tree using a non recursive breadth first traversal using queue
     void printNonRecursiveLevelOrder()
     {
-        auto queue = new ADS101::queue<treeNode*>();
+        auto queue = new ADS101::queue<btree*>();
         queue->enqueue(this);
 
         while(!queue->empty())
@@ -201,7 +201,7 @@ public:
 
 private:
     // Returns if the given data is found
-    bool exists(treeNode* node, T data)
+    bool exists(btree* node, T data)
     {
         do
         {
@@ -223,7 +223,7 @@ private:
     }
 
     // Removes a node with the given data, node is the root node
-    treeNode* remove(treeNode* node, T data)
+    btree* remove(btree* node, T data)
     {
         if(node == nullptr)
         {
@@ -277,7 +277,7 @@ private:
     }
 
     // Returns the lowest node from the given root node
-    treeNode* findMin(treeNode* node)
+    btree* findMin(btree* node)
     {
         auto currentNode = node;
 
@@ -290,7 +290,7 @@ private:
     }
 
     // Returns the highest node from the given root node
-    treeNode* findMax(treeNode* node)
+    btree* findMax(btree* node)
     {
         auto currentNode = node;
 
@@ -333,10 +333,10 @@ private:
     }
 
     T mData;
-    treeNode* left;
-    treeNode* right;
+    btree* left;
+    btree* right;
 };
 
 }
 
-#endif // NODE_H
+#endif // BINARYTREE_H

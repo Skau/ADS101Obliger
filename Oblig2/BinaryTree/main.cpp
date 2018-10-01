@@ -1,9 +1,9 @@
 #include <iostream>
-#include "treenode.h"
+#include "binarytree.h"
 
 int main()
 {
-    auto root = new ADS101::treeNode<int>(5);
+    auto root = new ADS101::btree<int>(5);
 
     root->insert(7);
     root->insert(9);

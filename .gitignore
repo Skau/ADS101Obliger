@@ -1,7 +1,2 @@
-build-Oblig1Del2-Desktop_Qt_5_9_1_MinGW_32bit-Debug/*
-build-Oblig1Del1-Desktop_Qt_5_11_0_MinGW_32bit-Debug/*
 
-build-Oblig1Del2-Desktop_Qt_5_11_0_MinGW_32bit-Debug/*
-
-Oblig1Del1/Oblig1Del1.pro.user
-*
+*.pro
