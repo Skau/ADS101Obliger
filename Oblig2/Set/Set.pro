@@ -16,3 +16,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp
+
+HEADERS += \
+    binarytree.h \
+    queue.h \
+    stack.h \
+    treeiterator.h
