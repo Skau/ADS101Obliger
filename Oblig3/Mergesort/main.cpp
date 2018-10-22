@@ -6,7 +6,7 @@ void merge_sort(std::vector<T>& a);
 template<typename T>
 void merge_sort(std::vector<T>& a, int low, int high);
 template<typename T>
-void merge(std::vector<T>& a, int left_low, int left_high, int right_low, int right_high);
+void merge_final(std::vector<T>& a, int left_low, int left_high, int right_low, int right_high);
 template<typename T>
 void print(std::vector<T>& a);
 
@@ -16,11 +16,9 @@ int main()
     std::vector<char> data2 = {'h', 'r', 'n', 'a', 'z', 'y', 'w', 'k', 'l'};
 
     merge_sort(data1);
-
     merge_sort(data2);
 
     print(data1);
-
     print(data2);
 
     return 0;
@@ -44,12 +42,12 @@ void merge_sort(std::vector<T>& a, int low, int high)
       int mid = (low + high) / 2;
       merge_sort(a, low, mid);
       merge_sort(a, mid + 1, high);
-      merge(a, low, mid, mid + 1, high);
+      merge_final(a, low, mid, mid + 1, high);
     }
 }
 
 template<typename T>
-void merge(std::vector<T>& a, int left_low, int left_high, int right_low, int right_high)
+void merge_final(std::vector<T>& a, int left_low, int left_high, int right_low, int right_high)
 {
     int length = right_high - left_low + 1;
     int temp[length];
