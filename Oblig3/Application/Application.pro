@@ -24,13 +24,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp
+    main.cpp \
+    mainwindow.cpp
 
 HEADERS += \
         mainwindow.h \
     sortbase.h \
-    mergesort.h
+    BinaryTree/binarytree.h \
+    BinaryTree/queue.h \
+    BinaryTree/stack.h \
+    mainwindow.h \
+    sortbase.h
 
 FORMS += \
         mainwindow.ui

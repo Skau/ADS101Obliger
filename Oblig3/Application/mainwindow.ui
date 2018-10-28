@@ -6,25 +6,152 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>444</width>
+    <height>577</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="mergeSortButton">
+   <widget class="QListWidget" name="timeTakenList">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>490</y>
-      <width>101</width>
-      <height>31</height>
+      <x>80</x>
+      <y>60</y>
+      <width>261</width>
+      <height>271</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="mergeCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>380</y>
+      <width>72</width>
+      <height>19</height>
      </rect>
     </property>
     <property name="text">
      <string>Merge Sort</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="insertionCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>410</y>
+      <width>91</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Insertion sort</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="quickCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>440</y>
+      <width>72</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Quick Sort</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="stlCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>380</y>
+      <width>91</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>STL (std::sort)</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="binaryTreeCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>410</y>
+      <width>101</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Binary Tree Sort</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="selectionCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>440</y>
+      <width>91</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Selection Sort</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="heapCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>350</y>
+      <width>72</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Heap Sort</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="sizeSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>380</y>
+      <width>61</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>100000</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>360</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Size of dataset</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="sortButton">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>430</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sort</string>
     </property>
    </widget>
   </widget>
@@ -33,7 +160,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>444</width>
      <height>20</height>
     </rect>
    </property>

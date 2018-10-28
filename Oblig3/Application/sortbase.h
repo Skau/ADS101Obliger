@@ -4,13 +4,18 @@
 #include <vector>
 #include <stdlib.h>
 #include <time.h>
+#include <algorithm>
+#include <QVariant>
 
 enum Algorithm
 {
-    Selection,
-    Insertion,
-    Merge,
-    Quick
+    SELECTION,
+    INSERTION,
+    MERGE,
+    QUICK,
+    STL,
+    BINARY_TREE,
+    HEAP
 };
 
 
@@ -23,61 +28,52 @@ public:
     }
 
     template <typename T>
-    void Sort(std::vector<T>& data, Algorithm algorithm)
+    void Sort(std::vector<T> data, Algorithm algorithm)
     {
-        switch (algorithm) {
-        case Selection:
-            SelectionSort(data);
-            break;
-        case Insertion:
-            InsertionSort(data);
-            break;
-        case Merge:
-            MergeSort(data);
-            break;
-        case Quick:
+        if(data.size())
         {
-            int low = 0;
-            int high = data.size() - 1;
-            QuickSort(data, low, high);
-            break;
+            switch (algorithm) {
+            case SELECTION:
+                SelectionSort(data);
+            case INSERTION:
+                InsertionSort(data);
+            case MERGE:
+                MergeSort(data);
+            case QUICK:
+            {
+                int low = 0;
+                int high = data.size() - 1;
+                QuickSort(data, low, high);
+            }
+            case STL:
+                STLSort(data);
+            case BINARY_TREE:
+                break;
+            case HEAP:
+                break;
+            default:
+                break;
+            }
         }
-        default:
-            break;
-        }
-    }
-
-    template <typename T>
-    std::vector<T> generateRandomData(int length)
-    {
-        std::vector<T> randomData;
-        randomData.reserve(length);
-
-        for(int i = 0; i < length; ++i)
-        {
-            randomData.push_back(rand() % 100 + 1);
-        }
-
-        return randomData;
     }
 
 private:
     template <typename T>
     void MergeSort(std::vector<T>& data)
     {
-        unsigned int i, j, k, lower1, lower2, size, upper1, upper2;
         std::vector<T> hjelp;
         hjelp.reserve(data.size());
-        size = 1;
+        unsigned int size = 1;
         while (size < data.size())
         {
-               lower1 = 0;
-               k = 0;
+               unsigned int i, j;
+               unsigned int lower1 = 0;
+               unsigned int k = 0;
                while (lower1+size < data.size())
                {
-                  upper1 = lower1+size-1;
-                  lower2 = upper1+1;
-                  upper2 = (lower2+size-1 < data.size()) ? lower2+size-1 : data.size()-1;
+                  unsigned int upper1 = lower1+size-1;
+                  unsigned int lower2 = upper1+1;
+                  unsigned int upper2 = (lower2+size-1 < data.size()) ? lower2+size-1 : data.size()-1;
                   for (i=lower1, j=lower2; i<=upper1 && j<=upper2; k++)
                      if (data[i] < data[j])
                         hjelp[k]=data[i++];
@@ -104,11 +100,10 @@ private:
     template <typename T>
     void InsertionSort(std::vector<T>& data)
     {
-        int key, j;
         for(unsigned int i = 0; i < data.size(); ++i)
         {
-            key = data[i];
-            j = i - 1;
+            int key = data[i];
+            int j = i - 1;
             while (j >= 0 && data[j] > key)
             {
                 data[j+1] =  data[j];
@@ -129,11 +124,9 @@ private:
     template <typename T>
     void SelectionSort(std::vector<T>& data)
     {
-        int min;
-
         for(unsigned int i = 0; i < data.size() - 1; ++i)
         {
-            min = i;
+            int min = i;
             for(unsigned int j = i + 1; j < data.size(); ++j)
             {
                 if(data[j] < data[min])
@@ -174,6 +167,12 @@ private:
         }
         swap(&data[i + 1], &data[high]);
         return i + 1;
+    }
+
+    template <typename T>
+   void STLSort(std::vector<T>& data)
+    {
+        std::sort(data.begin(), data.end());
     }
 
 };
