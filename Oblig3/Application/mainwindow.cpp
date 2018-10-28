@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtDebug>
-#include <conio.h>
-#include <ctime>
 #include "sortbase.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -27,7 +25,7 @@ void MainWindow::updateTimeTakenList(std::vector<std::pair<double, std::string>>
 
     for(auto itr = times.begin(); itr != times.end(); ++itr)
     {
-        list.push_back(QString::fromStdString(itr->second) + QString().setNum(itr->first, 'g', 6));
+        list.push_back(QString::fromStdString(itr->second) + QString().setNum(itr->first, 'g', 6) + " seconds");
     }
 
     ui->timeTakenList->addItems(list);
@@ -52,72 +50,49 @@ void MainWindow::on_sortButton_clicked()
     SortBase sb;
     auto data = generateRandomData<int>(ui->sizeSpinBox->value());
     std::vector<std::pair<double, std::string>> times;
-    clock_t startTime, endTime;
     double duration = 0.0f;
-    ui->timeTakenList->clear();
+
+    if(stl)
+    {
+        duration = sb.Sort(data, STL);
+        times.emplace_back(std::make_pair(duration, "std::Sort: "));
+    }
 
     if(quick)
     {
-        startTime = clock();
-        sb.Sort(data, QUICK);
-        endTime = clock();
-        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
+        duration = sb.Sort(data, QUICK);
         times.emplace_back(std::make_pair(duration, "Quick Sort: "));
     }
 
     if(selection)
     {
-        startTime = clock();
-        sb.Sort(data, SELECTION);
-        endTime = clock();
-        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
+        duration = sb.Sort(data, SELECTION);
         times.emplace_back(std::make_pair(duration, "Selection Sort: "));
     }
 
     if(insertion)
     {
-        startTime = clock();
-        sb.Sort(data, INSERTION);
-        endTime = clock();
-        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
+        duration = sb.Sort(data, INSERTION);
         times.emplace_back(std::make_pair(duration, "Insertion Sort: "));
     }
 
     if(merge)
     {
-        startTime = clock();
-        sb.Sort(data, MERGE);
-        endTime = clock();
-        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
+        duration = sb.Sort(data, MERGE);
         times.emplace_back(std::make_pair(duration, "Merge Sort: "));
     }
 
-    if(stl)
+    if(binarytree)
     {
-        startTime = clock();
-        sb.Sort(data, STL);
-        endTime = clock();
-        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
-        times.emplace_back(std::make_pair(duration, "std::Sort: "));
+        duration = sb.Sort(data, BINARY_TREE);
+        times.emplace_back(std::make_pair(duration, "Binary Search Tree Sort: "));
     }
 
-//    if(binarytree)
-//    {
-//        startTime = clock();
-//        sb.Sort(data, BINARY_TREE);
-//        endTime = clock();
-//        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
-//        times.emplace_back(std::make_pair(duration, "Binary Search Tree Sort: "));
-//    }
-
-//    if(heap)
-//    {
-//        startTime = clock();
-//        sb.Sort(data, HEAP);
-//        endTime = clock();
-//        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
-//        times.emplace_back(std::make_pair(duration, "Heap Sort: "));
-//    }
+    if(heap)
+    {
+        duration = sb.Sort(data, HEAP);
+        times.emplace_back(std::make_pair(duration, "(STL)Heap Sort: "));
+    }
 
     std::sort(times.begin(), times.end());
     updateTimeTakenList(times);
@@ -127,7 +102,6 @@ void MainWindow::on_sortButton_clicked()
         delete d;
         d = nullptr;
     }
-
     data.clear();
 }
 

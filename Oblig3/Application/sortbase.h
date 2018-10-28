@@ -2,10 +2,11 @@
 #define SORTBASE_H
 
 #include <vector>
-#include <stdlib.h>
-#include <time.h>
 #include <algorithm>
-#include <QVariant>
+#include <queue>
+#include <conio.h>
+#include <ctime>
+#include "BinaryTree/binarytree.h"
 
 enum Algorithm
 {
@@ -22,39 +23,61 @@ enum Algorithm
 class SortBase
 {
 public:
-    SortBase()
-    {
-        srand(time(NULL));
-    }
+    SortBase() = default;
 
     template <typename T>
-    void Sort(std::vector<T*> data, Algorithm algorithm)
+    double Sort(std::vector<T*> data, Algorithm algorithm)
     {
         if(data.size())
         {
+            clock_t startTime, endTime;
             switch (algorithm) {
             case SELECTION:
+                startTime = clock();
                 SelectionSort(data);
+                endTime = clock();
+                break;
             case INSERTION:
+                startTime = clock();
                 InsertionSort(data);
+                endTime = clock();
+                break;
             case MERGE:
+                startTime = clock();
                 MergeSort(data);
+                endTime = clock();
+                break;
             case QUICK:
             {
                 int low = 0;
                 int high = data.size() - 1;
+                startTime = clock();
                 QuickSort(data, low, high);
+                endTime = clock();
+                break;
             }
             case STL:
-                STLSort(data);
+                startTime = clock();
+                std::sort(data.begin(), data.end());
+                endTime = clock();
+                break;
             case BINARY_TREE:
+                startTime = clock();
+                BinarySearchTreeSort(data);
+                endTime = clock();
                 break;
             case HEAP:
+                startTime = clock();
+                HeapSort(data);
+                endTime = clock();
                 break;
             default:
+                return -1.0f;
                 break;
             }
+            return (endTime - startTime) / (double)CLOCKS_PER_SEC;
         }
+        return -1.0f;
     }
 
 private:
@@ -170,11 +193,24 @@ private:
     }
 
     template <typename T>
-   void STLSort(std::vector<T*>& data)
+    void BinarySearchTreeSort(std::vector<T*>& data)
     {
-        std::sort(data.begin(), data.end());
+        auto root = new ADS101::btree<int>(*data[0]);
+        for(unsigned int i = 0; i < data.size(); ++i)
+        {
+            root->insert(*data[i]);
+        }
     }
 
+    template <typename T>
+    void HeapSort(std::vector<T*>& data)
+    {
+        std::priority_queue<T*, std::vector<T*>, std::greater<T*>> heap;
+        for(unsigned int i = 0; i < data.size(); ++i)
+        {
+            heap.push(data[i]);
+        }
+    }
 };
 
 #endif // SORTBASE_H

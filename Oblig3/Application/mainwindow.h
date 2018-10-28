@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <vector>
-#include <map>
 #include <string>
 
 namespace Ui {
