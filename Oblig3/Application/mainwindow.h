@@ -16,7 +16,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_sortButton_clicked();
+    void on_mergeSortButton_clicked();
 
 private:
     Ui::MainWindow *ui;

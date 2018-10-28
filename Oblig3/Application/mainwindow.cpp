@@ -1,8 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtDebug>
-#include "sort.h"
-
+#include "sortbase.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -15,11 +14,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_sortButton_clicked()
+void MainWindow::on_mergeSortButton_clicked()
 {
-    std::vector<int> data = {8, 3, 2, 7, 6, 1, 9, 5, 4};
+    SortBase sort;
 
-    Sort sort;
+    auto data = sort.generateRandomData<int>(20);
 
-    sort.Merge(data);
+    sort.Sort(data, Quick);
+
+    for(auto& a : data)
+        qDebug() << a << " ";
 }
