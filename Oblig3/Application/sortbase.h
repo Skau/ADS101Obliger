@@ -28,7 +28,7 @@ public:
     }
 
     template <typename T>
-    void Sort(std::vector<T> data, Algorithm algorithm)
+    void Sort(std::vector<T*> data, Algorithm algorithm)
     {
         if(data.size())
         {
@@ -59,9 +59,9 @@ public:
 
 private:
     template <typename T>
-    void MergeSort(std::vector<T>& data)
+    void MergeSort(std::vector<T*>& data)
     {
-        std::vector<T> hjelp;
+        std::vector<T*> hjelp;
         hjelp.reserve(data.size());
         unsigned int size = 1;
         while (size < data.size())
@@ -98,11 +98,11 @@ private:
     }
 
     template <typename T>
-    void InsertionSort(std::vector<T>& data)
+    void InsertionSort(std::vector<T*>& data)
     {
         for(unsigned int i = 0; i < data.size(); ++i)
         {
-            int key = data[i];
+            auto key = data[i];
             int j = i - 1;
             while (j >= 0 && data[j] > key)
             {
@@ -122,7 +122,7 @@ private:
     }
 
     template <typename T>
-    void SelectionSort(std::vector<T>& data)
+    void SelectionSort(std::vector<T*>& data)
     {
         for(unsigned int i = 0; i < data.size() - 1; ++i)
         {
@@ -140,7 +140,7 @@ private:
     }
 
     template <typename T>
-    void QuickSort(std::vector<T>& data, int low, int high)
+    void QuickSort(std::vector<T*>& data, int low, int high)
     {
         if(low < high)
         {
@@ -152,9 +152,9 @@ private:
     }
 
     template <typename T>
-    int partition(std::vector<T>& data, int low,int high)
+    int partition(std::vector<T*>& data, int low,int high)
     {
-        int pivot = data[high];
+        auto pivot = data[high];
         int i = low - 1;
 
         for(int j = low; j < high; ++j)
@@ -170,7 +170,7 @@ private:
     }
 
     template <typename T>
-   void STLSort(std::vector<T>& data)
+   void STLSort(std::vector<T*>& data)
     {
         std::sort(data.begin(), data.end());
     }

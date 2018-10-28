@@ -41,7 +41,7 @@ private:
     void updateTimeTakenList(std::vector<std::pair<double, std::string>> times);
 
     template <typename T>
-    std::vector<T> generateRandomData(int length);
+    std::vector<T*> generateRandomData(int length);
 
     bool selection, insertion, merge, quick, stl, binarytree, heap;
 };

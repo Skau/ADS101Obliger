@@ -7,17 +7,19 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    selection{false}, insertion{false}, merge{false},
+    quick{false}, stl{false}, binarytree{false}, heap{false}
 {
     ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
-{
+{ 
     delete ui;
 }
 
-void MainWindow::updateTimeTakenList(std::vector<std::pair<double, std::string> > times)
+void MainWindow::updateTimeTakenList(std::vector<std::pair<double, std::string>> times)
 {
     ui->timeTakenList->clear();
 
@@ -32,14 +34,14 @@ void MainWindow::updateTimeTakenList(std::vector<std::pair<double, std::string> 
 }
 
 template<typename T>
-std::vector<T> MainWindow::generateRandomData(int length)
+std::vector<T*> MainWindow::generateRandomData(int length)
 {
-    std::vector<T> randomData;
+    std::vector<T*> randomData;
     randomData.reserve(length);
 
     for(int i = 0; i < length; ++i)
     {
-        randomData.push_back(rand() % 100 + 1);
+        randomData.push_back(new T(rand() % 100 + 1));
     }
 
     return randomData;
@@ -47,84 +49,86 @@ std::vector<T> MainWindow::generateRandomData(int length)
 
 void MainWindow::on_sortButton_clicked()
 {
+    SortBase sb;
     auto data = generateRandomData<int>(ui->sizeSpinBox->value());
-    qDebug() << data.size();
     std::vector<std::pair<double, std::string>> times;
-
+    clock_t startTime, endTime;
+    double duration = 0.0f;
     ui->timeTakenList->clear();
 
     if(quick)
     {
-        SortBase sb;
-        clock_t startTime = clock();
+        startTime = clock();
         sb.Sort(data, QUICK);
-        clock_t endTime = clock();
-        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+        endTime = clock();
+        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
         times.emplace_back(std::make_pair(duration, "Quick Sort: "));
     }
 
     if(selection)
     {
-        SortBase sb;
-        clock_t startTime = clock();
+        startTime = clock();
         sb.Sort(data, SELECTION);
-        clock_t endTime = clock();
-        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+        endTime = clock();
+        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
         times.emplace_back(std::make_pair(duration, "Selection Sort: "));
     }
 
     if(insertion)
     {
-        SortBase sb;
-        clock_t startTime = clock();
+        startTime = clock();
         sb.Sort(data, INSERTION);
-        clock_t endTime = clock();
-        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+        endTime = clock();
+        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
         times.emplace_back(std::make_pair(duration, "Insertion Sort: "));
     }
 
     if(merge)
     {
-        SortBase sb;
-        clock_t startTime = clock();
+        startTime = clock();
         sb.Sort(data, MERGE);
-        clock_t endTime = clock();
-        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+        endTime = clock();
+        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
         times.emplace_back(std::make_pair(duration, "Merge Sort: "));
     }
 
     if(stl)
     {
-        SortBase sb;
-        clock_t startTime = clock();
+        startTime = clock();
         sb.Sort(data, STL);
-        clock_t endTime = clock();
-        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+        endTime = clock();
+        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
         times.emplace_back(std::make_pair(duration, "std::Sort: "));
     }
 
 //    if(binarytree)
 //    {
-//        SortBase sb;
-//        clock_t startTime = clock();
+//        startTime = clock();
 //        sb.Sort(data, BINARY_TREE);
-//        clock_t endTime = clock();
-//        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+//        endTime = clock();
+//        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
 //        times.emplace_back(std::make_pair(duration, "Binary Search Tree Sort: "));
 //    }
 
 //    if(heap)
 //    {
-//        SortBase sb;
-//        clock_t startTime = clock();
+//        startTime = clock();
 //        sb.Sort(data, HEAP);
-//        clock_t endTime = clock();
-//        double duration = ( endTime - startTime ) / (double) CLOCKS_PER_SEC;
+//        endTime = clock();
+//        duration = ( endTime - startTime ) / (double)CLOCKS_PER_SEC;
 //        times.emplace_back(std::make_pair(duration, "Heap Sort: "));
 //    }
 
     std::sort(times.begin(), times.end());
     updateTimeTakenList(times);
+
+    for(auto& d : data)
+    {
+        delete d;
+        d = nullptr;
+    }
+
+    data.clear();
 }
 
 void MainWindow::on_quickCheckBox_stateChanged(int arg1)
