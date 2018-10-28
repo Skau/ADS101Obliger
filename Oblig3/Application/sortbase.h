@@ -1,51 +1,50 @@
 #ifndef SORTBASE_H
 #define SORTBASE_H
 
-#include <vector>
+#include <mainwindow.h>
+
 #include <algorithm>
-#include <queue>
 #include <conio.h>
 #include <ctime>
+#include <queue>
 #include "BinaryTree/binarytree.h"
-
-enum Algorithm
-{
-    SELECTION,
-    INSERTION,
-    MERGE,
-    QUICK,
-    STL,
-    BINARY_TREE,
-    HEAP
-};
-
 
 class SortBase
 {
 public:
-    SortBase() = default;
+    SortBase(MainWindow* window)
+    {
+        window_ = window;
+    }
 
     template <typename T>
-    double Sort(std::vector<T*> data, Algorithm algorithm)
+    void Sort(std::vector<T*> data, Algorithm algorithm)
     {
         if(data.size())
         {
             clock_t startTime, endTime;
+            double duration;
             switch (algorithm) {
             case SELECTION:
                 startTime = clock();
                 SelectionSort(data);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Selection Sort: ", duration);
                 break;
             case INSERTION:
                 startTime = clock();
                 InsertionSort(data);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Insertion Sort: ", duration);
                 break;
             case MERGE:
                 startTime = clock();
                 MergeSort(data);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Merge Sort: ", duration);
                 break;
             case QUICK:
             {
@@ -54,30 +53,37 @@ public:
                 startTime = clock();
                 QuickSort(data, low, high);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Quick Sort: ", duration);
                 break;
             }
             case STL:
                 startTime = clock();
                 std::sort(data.begin(), data.end());
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("std::Sort: ", duration);
                 break;
             case BINARY_TREE:
                 startTime = clock();
                 BinarySearchTreeSort(data);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Binary Search Tree Sort: ", duration);
                 break;
             case HEAP:
                 startTime = clock();
                 HeapSort(data);
                 endTime = clock();
+                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                window_->updateTimeTakenList("Heap Sort: ", duration);
                 break;
             default:
-                return -1.0f;
                 break;
             }
-            return (endTime - startTime) / (double)CLOCKS_PER_SEC;
         }
-        return -1.0f;
+
+        window_->onThreadExit(std::this_thread::get_id(), algorithm);
     }
 
 private:
@@ -211,6 +217,9 @@ private:
             heap.push(data[i]);
         }
     }
+
+    MainWindow* window_;
+    std::mutex mutex_;
 };
 
 #endif // SORTBASE_H

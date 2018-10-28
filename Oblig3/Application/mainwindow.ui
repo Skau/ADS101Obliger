@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>536</height>
+    <width>688</width>
+    <height>432</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,60 +15,142 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item alignment="Qt::AlignHCenter">
+     <widget class="QLabel" name="progressLabelTitle">
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Progress:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="progressLayout1">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_Insertion">
+        <property name="text">
+         <string>Insertion Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_Quick">
+        <property name="text">
+         <string>Quick Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_Selection">
+        <property name="text">
+         <string>Selection Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="progressLayout2">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_BT">
+        <property name="text">
+         <string>Binary Tree: Not started</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_Merge">
+        <property name="text">
+         <string>Merge Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_stdSort">
+        <property name="text">
+         <string>std::Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="plabel_Heap">
+        <property name="text">
+         <string>Heap Sort: Not started</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
     <item>
      <widget class="QListWidget" name="timeTakenList"/>
     </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout"/>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="selectionCheckBox">
+    <item alignment="Qt::AlignHCenter">
+     <widget class="QLabel" name="checkBoxLabelTitle">
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
       <property name="text">
-       <string>Selection Sort</string>
+       <string>Setup:</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QCheckBox" name="insertionCheckBox">
-      <property name="text">
-       <string>Insertion sort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="quickCheckBox">
-      <property name="text">
-       <string>Quick Sort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="heapCheckBox">
-      <property name="text">
-       <string>(STL) Heap Sort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="mergeCheckBox">
-      <property name="text">
-       <string>Merge Sort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="binaryTreeCheckBox">
-      <property name="text">
-       <string>Binary Tree Sort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="stlCheckBox">
-      <property name="text">
-       <string>(STL) std::sort</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="checkBoxLayout1">
+      <item>
+       <widget class="QCheckBox" name="selectionCheckBox">
+        <property name="text">
+         <string>Selection Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QCheckBox" name="insertionCheckBox">
+        <property name="text">
+         <string>Insertion sort</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="mergeCheckBox">
+        <property name="text">
+         <string>Merge Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QCheckBox" name="quickCheckBox">
+        <property name="text">
+         <string>Quick Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="binaryTreeCheckBox">
+        <property name="text">
+         <string>Binary Tree Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="stlCheckBox">
+        <property name="text">
+         <string>(STL) std::sort</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="heapCheckBox">
+        <property name="text">
+         <string>(STL) Heap Sort</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QSpinBox" name="sizeSpinBox">
@@ -100,7 +182,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>395</width>
+     <width>688</width>
      <height>20</height>
     </rect>
    </property>

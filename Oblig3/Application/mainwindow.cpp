@@ -1,15 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtDebug>
 #include "sortbase.h"
+#include <QtDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    selection{false}, insertion{false}, merge{false},
-    quick{false}, stl{false}, binarytree{false}, heap{false}
+    selection_{false}, insertion_{false}, merge_{false},
+    quick_{false}, stl_{false}, binarytree_{false}, heap_{false}
 {
     ui->setupUi(this);
+    ui->statusBar->showMessage("Hello");
 }
 
 MainWindow::~MainWindow()
@@ -17,18 +18,19 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updateTimeTakenList(std::vector<std::pair<double, std::string>> times)
+void MainWindow::updateTimeTakenList(std::string s, double d)
 {
-    ui->timeTakenList->clear();
-
     QStringList list;
 
-    for(auto itr = times.begin(); itr != times.end(); ++itr)
-    {
-        list.push_back(QString::fromStdString(itr->second) + QString().setNum(itr->first, 'g', 6) + " seconds");
-    }
+    list.push_back(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
 
     ui->timeTakenList->addItems(list);
+}
+
+void MainWindow::onThreadExit(std::thread::id id, Algorithm algorithm)
+{
+    std::lock_guard<std::mutex> lk(mutex_);
+    updateLabelStatus(algorithm, FINISHED);
 }
 
 template<typename T>
@@ -47,95 +49,183 @@ std::vector<T*> MainWindow::generateRandomData(int length)
 
 void MainWindow::on_sortButton_clicked()
 {
-    SortBase sb;
-    auto data = generateRandomData<int>(ui->sizeSpinBox->value());
-    std::vector<std::pair<double, std::string>> times;
-    double duration = 0.0f;
-
-    if(stl)
+    if(data_.size())
     {
-        duration = sb.Sort(data, STL);
-        times.emplace_back(std::make_pair(duration, "std::Sort: "));
+        for(auto& d : data_)
+        {
+            delete d;
+            d = nullptr;
+        }
+        data_.clear();
+
+        ui->timeTakenList->clear();
     }
 
-    if(quick)
+    data_ = generateRandomData<int>(ui->sizeSpinBox->value());
+
+    if(stl_)
     {
-        duration = sb.Sort(data, QUICK);
-        times.emplace_back(std::make_pair(duration, "Quick Sort: "));
+        updateLabelStatus(STL, IN_PROGRESS);
+        t1_ = std::thread(&MainWindow::sort, this, STL);
+        t1_.detach();
+    }
+    else
+    {
+        updateLabelStatus(STL, NOT_STARTED);
     }
 
-    if(selection)
+    if(quick_)
     {
-        duration = sb.Sort(data, SELECTION);
-        times.emplace_back(std::make_pair(duration, "Selection Sort: "));
+        updateLabelStatus(QUICK, IN_PROGRESS);
+        t2_ = std::thread(&MainWindow::sort, this, QUICK);
+        t2_.detach();
+    }
+    else
+    {
+        updateLabelStatus(QUICK, NOT_STARTED);
     }
 
-    if(insertion)
+    if(selection_)
     {
-        duration = sb.Sort(data, INSERTION);
-        times.emplace_back(std::make_pair(duration, "Insertion Sort: "));
+        updateLabelStatus(SELECTION, IN_PROGRESS);
+        t3_ = std::thread(&MainWindow::sort, this, SELECTION);
+        t3_.detach();
+    }
+    else
+    {
+        updateLabelStatus(SELECTION, NOT_STARTED);
     }
 
-    if(merge)
+    if(insertion_)
     {
-        duration = sb.Sort(data, MERGE);
-        times.emplace_back(std::make_pair(duration, "Merge Sort: "));
+        updateLabelStatus(INSERTION, IN_PROGRESS);
+        t4_ = std::thread(&MainWindow::sort, this, INSERTION);
+        t4_.detach();
+    }
+    else
+    {
+        updateLabelStatus(INSERTION, NOT_STARTED);
     }
 
-    if(binarytree)
+    if(merge_)
     {
-        duration = sb.Sort(data, BINARY_TREE);
-        times.emplace_back(std::make_pair(duration, "Binary Search Tree Sort: "));
+        updateLabelStatus(MERGE, IN_PROGRESS);
+        t5_ = std::thread(&MainWindow::sort, this, MERGE);
+        t5_.detach();
+    }
+    else
+    {
+        updateLabelStatus(MERGE, NOT_STARTED);
     }
 
-    if(heap)
+    if(binarytree_)
     {
-        duration = sb.Sort(data, HEAP);
-        times.emplace_back(std::make_pair(duration, "(STL)Heap Sort: "));
+        updateLabelStatus(BINARY_TREE, IN_PROGRESS);
+        t6_ = std::thread(&MainWindow::sort, this, BINARY_TREE);
+        t6_.detach();
+    }
+    else
+    {
+        updateLabelStatus(BINARY_TREE, NOT_STARTED);
     }
 
-    std::sort(times.begin(), times.end());
-    updateTimeTakenList(times);
-
-    for(auto& d : data)
+    if(heap_)
     {
-        delete d;
-        d = nullptr;
+        updateLabelStatus(HEAP, IN_PROGRESS);
+        t7_ = std::thread(&MainWindow::sort, this, HEAP);
+        t7_.detach();
     }
-    data.clear();
+    else
+    {
+        updateLabelStatus(HEAP, NOT_STARTED);
+    }
 }
 
 void MainWindow::on_quickCheckBox_stateChanged(int arg1)
 {
-    quick = arg1;
+    quick_ = arg1;
 }
 
 void MainWindow::on_insertionCheckBox_stateChanged(int arg1)
 {
-    insertion = arg1;
+    insertion_ = arg1;
 }
 
 void MainWindow::on_mergeCheckBox_stateChanged(int arg1)
 {
-    merge = arg1;
+    merge_ = arg1;
 }
 
 void MainWindow::on_heapCheckBox_stateChanged(int arg1)
 {
-    heap = arg1;
+    heap_ = arg1;
 }
 
 void MainWindow::on_stlCheckBox_stateChanged(int arg1)
 {
-    stl = arg1;
+    stl_ = arg1;
 }
 
 void MainWindow::on_binaryTreeCheckBox_stateChanged(int arg1)
 {
-    binarytree = arg1;
+    binarytree_ = arg1;
 }
 
 void MainWindow::on_selectionCheckBox_stateChanged(int arg1)
 {
-    selection = arg1;
+    selection_ = arg1;
+}
+
+void MainWindow::sort(Algorithm algorithm)
+{
+    SortBase sb(this);
+    sb.Sort(data_, algorithm);
+}
+
+void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
+{
+
+    std::string statusText;
+
+    switch (status) {
+    case NOT_STARTED:
+        statusText = STATUS_NOTSTARTED;
+        break;
+    case IN_PROGRESS:
+        statusText = STATUS_PROGRESS;
+        break;
+    case FINISHED:
+        statusText = STATUS_FINISHED;
+        break;
+    default:
+        break;
+    }
+
+    switch (algorithm) {
+    case SELECTION:
+        ui->plabel_Selection->setText("Selection Sort: " + QString::fromStdString(statusText));
+        break;
+    case INSERTION:
+        ui->plabel_Insertion->setText("Insertion Sort: " + QString::fromStdString(statusText));
+        break;
+    case MERGE:
+        ui->plabel_Merge->setText("Merge Sort: " + QString::fromStdString(statusText));
+        break;
+    case QUICK:
+        ui->plabel_Quick->setText("Quick Sort: " + QString::fromStdString(statusText));
+        break;
+    case STL:
+        ui->plabel_stdSort->setText("std::Sort: " + QString::fromStdString(statusText));
+        break;
+    case BINARY_TREE:
+        ui->plabel_BT->setText("Binary Tree: " + QString::fromStdString(statusText));
+        break;
+    case HEAP:
+        ui->plabel_Heap->setText("Heap Sort: " + QString::fromStdString(statusText));
+        break;
+    default:
+        break;
+    }
+
+
 }
