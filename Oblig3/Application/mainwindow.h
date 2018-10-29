@@ -45,6 +45,8 @@ public:
 
     void onThreadExit(Algorithm algorithm);
 
+    bool getIsSorting() { return isSorting_; }
+
 private slots:
     void on_sortButton_clicked();
 
@@ -63,6 +65,8 @@ private slots:
     void on_selectionCheckBox_stateChanged(int arg1);
 
     void on_bogoCheckBox_stateChanged(int arg1);
+
+    void on_stopButton_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -8,8 +8,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), isSorting_{false},
-    selectionEnabled_{false}, insertionEnabled_{false}, mergeEnabled_{false}, bogoEnabled_{false},
-    quickEnabled_{false}, stlSort_Enabled{false}, binarytreeEnabled_{false}, stlHeapEnabled_{false},
+    selectionEnabled_{true}, insertionEnabled_{true}, mergeEnabled_{true}, bogoEnabled_{false},
+    quickEnabled_{true}, stlSort_Enabled{true}, binarytreeEnabled_{true}, stlHeapEnabled_{true},
     numberOfWorkingThreads_{0}
 {
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    isSorting_ = false;
+
     delete elapsedTimer_;
     delete ui;
 }
@@ -226,7 +228,6 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
 
 void MainWindow::updateElapsedTime()
 {
-    while(numberOfWorkingThreads_ > 0)
     {
         auto time = elapsedTimer_->elapsed();
         ui->label_TimeElapsed->setText("Elapsed time: " + QString::number(time/1000) + " seconds");
@@ -283,4 +284,10 @@ void MainWindow::sort(Algorithm algorithm)
     sb.Sort(data_, algorithm);
 }
 
-
+void MainWindow::on_stopButton_clicked()
+{
+    if(isSorting_)
+    {
+        isSorting_ = false;
+    }
+}

@@ -3,6 +3,7 @@
 
 #include <mainwindow.h>
 
+#include <QDebug>
 #include <algorithm>
 #include <conio.h>
 #include <ctime>
@@ -25,11 +26,17 @@ public:
     {
         if(dataSet.size())
         {
-            clock_t startTime, endTime;
+            clock_t startTime = 0, endTime = 0;
             double duration;
             std::string s;
             for(unsigned int i = 0; i < dataSet.size(); ++i)
             {
+                if(!checkIfStillRunning())
+                {
+                    window_->onThreadExit(algorithm);
+                    return;
+                }
+
                 if(dataSet[i].size())
                 {
 
@@ -106,6 +113,7 @@ public:
 private:
     MainWindow* window_;
     std::vector<double> times_;
+    std::mutex mutex_;
 
     template<typename T>
     void merge_sort(std::vector<T>& data, int low, int high)
@@ -131,6 +139,10 @@ private:
         int left = left_low;
         int right = right_low;
         for (int i = 0; i < length; ++i) {
+
+        if(!checkIfStillRunning())
+            return;
+
             if (left > left_high)
                 temp.push_back(data[right++]);
             else if (right > right_high)
@@ -141,7 +153,11 @@ private:
                 temp.push_back(data[right++]);
         }
         for (int i = 0; i < length; ++i)
+        {
+            if(!checkIfStillRunning())
+                return;
             data[left_low++] = temp[i];
+        }
     }
 
     template <typename T>
@@ -153,6 +169,9 @@ private:
             unsigned int j = i - 1;
             while (j >= 0 && data[j] > key)
             {
+                if(!checkIfStillRunning())
+                    return;
+
                 data[j+1] = data[j];
                 j = j - 1;
             }
@@ -173,9 +192,13 @@ private:
     {
         for(unsigned int i = 0; i < data.size() - 1; ++i)
         {
+            if(!checkIfStillRunning())
+                return;
             unsigned int min = i;
             for(unsigned int j = i + 1; j < data.size(); ++j)
             {
+                if(!checkIfStillRunning())
+                    return;
                 if(data[j] < data[min])
                 {
                     min = j;
@@ -192,6 +215,9 @@ private:
         {
             int pi = partition(data, low, high);
 
+            if(pi == -1)
+                return;
+
             QuickSort(data, low,  pi - 1);
             QuickSort(data, pi + 1, high);
         }
@@ -205,6 +231,9 @@ private:
 
         for(int j = low; j < high; ++j)
         {
+            if(!checkIfStillRunning())
+                return -1;
+
             if(data[j] <= pivot)
             {
                 i++;
@@ -231,6 +260,8 @@ private:
         std::priority_queue<T, std::vector<T>, std::greater<T>> heap;
         for(unsigned int i = 0; i < data.size(); ++i)
         {
+            if(!checkIfStillRunning())
+                return;
             heap.push(data[i]);
         }
     }
@@ -240,6 +271,8 @@ private:
     {
         while(!isSorted(data, data.size()))
         {
+            if(!checkIfStillRunning())
+                return;
             shuffle(data);
         }
     }
@@ -249,7 +282,10 @@ private:
     {
         while(--n > 0)
         {
-            if(data[n-1] < data[n-2])
+            if(!checkIfStillRunning())
+                return true;
+
+            if(data[n] < data[n-1])
             {
                 return false;
             }
@@ -262,8 +298,17 @@ private:
     {
         for(unsigned int i = 0; i < data.size(); ++i)
         {
+            if(!checkIfStillRunning())
+                return;
             swap(&data[i], &data[rand()%data.size()]);
         }
+    }
+
+    bool checkIfStillRunning()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        return window_->getIsSorting();
     }
 };
 
