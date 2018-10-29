@@ -72,6 +72,19 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <layout class="QVBoxLayout" name="layoutDefault">
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
          <widget class="QLabel" name="plabel_Selection">
           <property name="font">
@@ -156,6 +169,21 @@
           </property>
          </widget>
         </item>
+        <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+         <widget class="QLabel" name="plabel_Bogo">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Bogo Sort: Not started</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QFormLayout" name="formLayout"/>
+        </item>
        </layout>
       </item>
       <item>
@@ -176,6 +204,38 @@
       </item>
       <item alignment="Qt::AlignLeft|Qt::AlignVCenter">
        <widget class="QListWidget" name="timeTakenList"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Maximum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>251</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="label_TimeElapsed">
+        <property name="font">
+         <font>
+          <pointsize>14</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Time: 0</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -274,6 +334,18 @@
         </property>
         <property name="text">
          <string>Binary Tree Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="bogoCheckBox">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Bogo Sort</string>
         </property>
        </widget>
       </item>

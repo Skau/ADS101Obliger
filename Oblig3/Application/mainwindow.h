@@ -8,6 +8,8 @@
 #include <thread>
 #include <mutex>
 
+class QElapsedTimer;
+
 enum Algorithm
 {
     SELECTION,
@@ -16,7 +18,8 @@ enum Algorithm
     QUICK,
     STL_SORT,
     BINARY_TREE,
-    STL_HEAP
+    STL_HEAP,
+    BOGO
 };
 
 enum Status
@@ -59,27 +62,35 @@ private slots:
 
     void on_selectionCheckBox_stateChanged(int arg1);
 
+    void on_bogoCheckBox_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 
     template <typename T>
-    std::vector<T*> generateRandomData(int length);
+    std::vector<T> generateRandomData(int length);
 
     void sort(Algorithm algorithm);
 
     void updateLabelStatus(Algorithm algorithm, Status status);
 
-    std::vector<std::vector<int*>> data_;
+    std::vector<std::vector<int>> data_;
 
-    std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_;
+    std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_, t8_, t9_;
     std::mutex mutex_;
 
-    bool selectionEnabled_, insertionEnabled_, mergeEnabled_,
+    int numberOfWorkingThreads_;
+
+    void updateElapsedTime();
+
+    bool selectionEnabled_, insertionEnabled_, mergeEnabled_, bogoEnabled_,
     quickEnabled_, stlSort_Enabled, binarytreeEnabled_, stlHeapEnabled_;
 
     const std::string STATUS_NOT_STARTED = "Not started";
     const std::string STATUS_IN_PROGRESS = "In progress";
     const std::string STATUS_FINISHED = "Finished";
+
+    QElapsedTimer* elapsedTimer_;
 };
 
 #endif // MAINWINDOW_H

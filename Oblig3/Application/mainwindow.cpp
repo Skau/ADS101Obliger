@@ -3,18 +3,22 @@
 #include "sortbase.h"
 #include <QtDebug>
 #include <QDialog>
+#include <QElapsedTimer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    selectionEnabled_{false}, insertionEnabled_{false}, mergeEnabled_{false},
-    quickEnabled_{false}, stlSort_Enabled{false}, binarytreeEnabled_{false}, stlHeapEnabled_{false}
+    selectionEnabled_{false}, insertionEnabled_{false}, mergeEnabled_{false}, bogoEnabled_{false},
+    quickEnabled_{false}, stlSort_Enabled{false}, binarytreeEnabled_{false}, stlHeapEnabled_{false},
+    numberOfWorkingThreads_{0}
 {
+    srand(time(NULL));
     ui->setupUi(this);
 
     // Remove bottom right corner grip, because resizing is disabled (min / max window size are equal)
     ui->statusBar->setSizeGripEnabled(false);
 
+    elapsedTimer_ = new QElapsedTimer();
 }
 
 MainWindow::~MainWindow()
@@ -25,28 +29,27 @@ MainWindow::~MainWindow()
 void MainWindow::updateTimeTakenList(std::string s, double d)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    QStringList list;
 
-    list.push_back(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
-
-    ui->timeTakenList->addItems(list);
+    ui->timeTakenList->addItem(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
 }
 
 void MainWindow::onThreadExit(Algorithm algorithm)
 {
     std::lock_guard<std::mutex> lock(mutex_);
+
     updateLabelStatus(algorithm, FINISHED);
+    numberOfWorkingThreads_--;
 }
 
 template<typename T>
-std::vector<T*> MainWindow::generateRandomData(int length)
+std::vector<T> MainWindow::generateRandomData(int length)
 {
-    std::vector<T*> randomData;
+    std::vector<T> randomData;
     randomData.reserve(length);
 
     for(int i = 0; i < length; ++i)
     {
-        randomData.push_back(new T(rand() % 100 + 1));
+        randomData.push_back(T(rand() % 100 + 1));
     }
 
     return randomData;
@@ -58,11 +61,6 @@ void MainWindow::on_sortButton_clicked()
     {
         for(auto& data : data_)
         {
-            for(auto& d : data)
-            {
-                delete d;
-                d = nullptr;
-            }
             data.clear();
         }
         data_.clear();
@@ -70,6 +68,7 @@ void MainWindow::on_sortButton_clicked()
         ui->timeTakenList->clear();
     }
 
+    data_.reserve(ui->numOfDataSetSpinBox->value());
     for(int i = 0; i < ui->numOfDataSetSpinBox->value(); ++i)
     {
         data_.push_back(generateRandomData<int>(ui->sizeOfDataSetSpinBox->value()));
@@ -80,6 +79,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(STL_SORT, IN_PROGRESS);
         t1_ = std::thread(&MainWindow::sort, this, STL_SORT);
         t1_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
@@ -91,32 +91,35 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(QUICK, IN_PROGRESS);
         t2_ = std::thread(&MainWindow::sort, this, QUICK);
         t2_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
         updateLabelStatus(QUICK, NOT_STARTED);
     }
 
-    if(selectionEnabled_)
-    {
-        updateLabelStatus(SELECTION, IN_PROGRESS);
-        t3_ = std::thread(&MainWindow::sort, this, SELECTION);
-        t3_.detach();
-    }
-    else
-    {
-        updateLabelStatus(SELECTION, NOT_STARTED);
-    }
-
     if(insertionEnabled_)
     {
         updateLabelStatus(INSERTION, IN_PROGRESS);
-        t4_ = std::thread(&MainWindow::sort, this, INSERTION);
-        t4_.detach();
+        t3_ = std::thread(&MainWindow::sort, this, INSERTION);
+        t3_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
         updateLabelStatus(INSERTION, NOT_STARTED);
+    }
+
+    if(selectionEnabled_)
+    {
+        updateLabelStatus(SELECTION, IN_PROGRESS);
+        t4_ = std::thread(&MainWindow::sort, this, SELECTION);
+        t4_.detach();
+        numberOfWorkingThreads_++;
+    }
+    else
+    {
+        updateLabelStatus(SELECTION, NOT_STARTED);
     }
 
     if(mergeEnabled_)
@@ -124,6 +127,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(MERGE, IN_PROGRESS);
         t5_ = std::thread(&MainWindow::sort, this, MERGE);
         t5_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
@@ -135,6 +139,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(BINARY_TREE, IN_PROGRESS);
         t6_ = std::thread(&MainWindow::sort, this, BINARY_TREE);
         t6_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
@@ -146,11 +151,27 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(STL_HEAP, IN_PROGRESS);
         t7_ = std::thread(&MainWindow::sort, this, STL_HEAP);
         t7_.detach();
+        numberOfWorkingThreads_++;
     }
     else
     {
         updateLabelStatus(STL_HEAP, NOT_STARTED);
     }
+
+    if(bogoEnabled_)
+    {
+        updateLabelStatus(BOGO, IN_PROGRESS);
+        t8_ = std::thread(&MainWindow::sort, this, BOGO);
+        t8_.detach();
+        numberOfWorkingThreads_++;
+    }
+    else
+    {
+        updateLabelStatus(BOGO, NOT_STARTED);
+    }
+
+    elapsedTimer_->start();
+    t9_ = std::thread(&MainWindow::updateElapsedTime, this);
 }
 
 void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
@@ -193,9 +214,23 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
     case STL_HEAP:
         ui->plabel_Heap->setText("Heap Sort: " + QString::fromStdString(statusText));
         break;
+    case BOGO:
+        ui->plabel_Bogo->setText("Bogo Sort: " + QString::fromStdString(statusText));
+        break;
     default:
         break;
     }
+}
+
+void MainWindow::updateElapsedTime()
+{
+    while(numberOfWorkingThreads_ > 0)
+    {
+        auto time = elapsedTimer_->elapsed();
+        ui->label_TimeElapsed->setText("Elapsed time: " + QString::number(time/1000) + " seconds");
+    }
+
+    t9_.detach();
 }
 
 void MainWindow::on_quickCheckBox_stateChanged(int arg1)
@@ -233,8 +268,15 @@ void MainWindow::on_selectionCheckBox_stateChanged(int arg1)
     selectionEnabled_ = arg1;
 }
 
+void MainWindow::on_bogoCheckBox_stateChanged(int arg1)
+{
+    bogoEnabled_ = arg1;
+}
+
 void MainWindow::sort(Algorithm algorithm)
 {
     SortBase sb(this);
     sb.Sort(data_, algorithm);
 }
+
+

@@ -8,17 +8,20 @@
 #include <ctime>
 #include <queue>
 #include "BinaryTree/binarytree.h"
+#include <stdlib.h>
+#include <time.h>
 
 class SortBase
 {
 public:
     SortBase(MainWindow* window)
     {
+        srand(time(NULL));
         window_ = window;
     }
 
     template <typename T>
-    void Sort(std::vector<std::vector<T*>> dataSet, Algorithm algorithm)
+    void Sort(std::vector<std::vector<T>> dataSet, Algorithm algorithm)
     {
         for(unsigned int i = 0; i < dataSet.size(); ++i)
         {
@@ -65,7 +68,7 @@ public:
                     break;
                 case MERGE:
                     startTime = clock();
-                    MergeSort(dataSet[i]);
+                    merge_sort(dataSet[i], 0, dataSet[i].size() - 1);
                     endTime = clock();
                     duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
                     times_.push_back(duration);
@@ -157,65 +160,81 @@ public:
                         return;
                     }
                     break;
+                case BOGO:
+                    startTime = clock();
+                    BogoSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Bogo Sort: ", totalTime);
+                        window_->onThreadExit(BOGO);
+                        return;
+                    }
+                    break;
                 default:
                     break;
                 }
             }
         }
-
         window_->onThreadExit(algorithm);
     }
 
 private:
-    template <typename T>
-    void MergeSort(std::vector<T*>& data)
+    template<typename T>
+    void merge_sort(std::vector<T>& data, int low, int high)
     {
-        std::vector<T*> hjelp;
-        hjelp.reserve(data.size());
-        unsigned int size = 1;
-        while (size < data.size())
+        if (low >= high)
         {
-               unsigned int i, j;
-               unsigned int lower1 = 0;
-               unsigned int k = 0;
-               while (lower1+size < data.size())
-               {
-                  unsigned int upper1 = lower1+size-1;
-                  unsigned int lower2 = upper1+1;
-                  unsigned int upper2 = (lower2+size-1 < data.size()) ? lower2+size-1 : data.size()-1;
-                  for (i=lower1, j=lower2; i<=upper1 && j<=upper2; k++)
-                     if (data[i] < data[j])
-                        hjelp[k]=data[i++];
-                     else
-                        hjelp[k] = data[j++];
+            return;
+        }
+        else
+        {
+          int mid = (low + high) / 2;
+          merge_sort(data, low, mid);
+          merge_sort(data, mid + 1, high);
+          merge(data, low, mid, mid + 1, high);
+        }
+    }
 
-                  for (; i<=upper1; k++)
-                     hjelp[k] = data[i++];
-                  for (; j<=upper2; k++)
-                     hjelp[k] = data[j++];
+    template<typename T>
+    void merge(std::vector<T>& data, int left_low, int left_high, int right_low, int right_high)
+    {
+        int length = right_high - left_low + 1;
+        int temp[length];
+        int left = left_low;
+        int right = right_low;
+        for (int i = 0; i < length; ++i) {
+            if (left > left_high)
+                temp[i] = data[right++];
+            else if (right > right_high)
+                temp[i] = data[left++];
+            else if (data[left] <= data[right])
+                temp[i] = data[left++];
+            else
+                temp[i] = data[right++];
+        }
 
-                  lower1 = upper2+1;
-               } // endwhile
-
-               for (i=lower1; k<data.size(); i++)
-                  hjelp[k++] = data[i];
-               for (i=0; i<data.size(); i++)
-                  data[i] = hjelp[i];
-
-               size = size*2;
-           }
+        for (int i=0; i< length; ++i)
+            data[left_low++] = temp[i];
     }
 
     template <typename T>
-    void InsertionSort(std::vector<T*>& data)
+    void InsertionSort(std::vector<T>& data)
     {
         for(unsigned int i = 0; i < data.size(); ++i)
         {
-            auto key = data[i];
+            int key = data[i];
             int j = i - 1;
             while (j >= 0 && data[j] > key)
             {
-                data[j+1] =  data[j];
+                data[j+1] = data[j];
                 j = j - 1;
             }
             data[j+1] = key;
@@ -231,7 +250,7 @@ private:
     }
 
     template <typename T>
-    void SelectionSort(std::vector<T*>& data)
+    void SelectionSort(std::vector<T>& data)
     {
         for(unsigned int i = 0; i < data.size() - 1; ++i)
         {
@@ -249,7 +268,7 @@ private:
     }
 
     template <typename T>
-    void QuickSort(std::vector<T*>& data, int low, int high)
+    void QuickSort(std::vector<T>& data, int low, int high)
     {
         if(low < high)
         {
@@ -261,9 +280,9 @@ private:
     }
 
     template <typename T>
-    int partition(std::vector<T*>& data, int low,int high)
+    int partition(std::vector<T>& data, int low,int high)
     {
-        auto pivot = data[high];
+        int pivot = data[high];
         int i = low - 1;
 
         for(int j = low; j < high; ++j)
@@ -279,22 +298,54 @@ private:
     }
 
     template <typename T>
-    void BinarySearchTreeSort(std::vector<T*>& data)
+    void BinarySearchTreeSort(std::vector<T>& data)
     {
-        auto root = ADS101::btree<int>(*data[0]);
+        auto root = ADS101::btree<int>(data[0]);
         for(unsigned int i = 0; i < data.size(); ++i)
         {
-            root.insert(*data[i]);
+            root.insert(data[i]);
         }
     }
 
     template <typename T>
-    void HeapSort(std::vector<T*>& data)
+    void HeapSort(std::vector<T>& data)
     {
-        std::priority_queue<T*, std::vector<T*>, std::greater<T*>> heap;
+        std::priority_queue<T, std::vector<T>, std::greater<T>> heap;
         for(unsigned int i = 0; i < data.size(); ++i)
         {
             heap.push(data[i]);
+        }
+    }
+
+    template <typename T>
+    void BogoSort(std::vector<T>& data)
+    {
+        while(!isSorted(data, data.size()))
+        {
+            shuffle(data);
+        }
+    }
+
+    template <typename T>
+    bool isSorted(std::vector<T>& data, unsigned int n)
+    {
+        while(--n > 0)
+        {
+            if(data[n-1] < data[n-2])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    template <typename T>
+    void shuffle(std::vector<T>& data)
+    {
+        for(unsigned int i = 0; i < data.size(); ++i)
+        {
+            swap(&data[i], &data[rand()%data.size()]);
         }
     }
 
