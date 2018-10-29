@@ -7,12 +7,12 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
+    ui(new Ui::MainWindow), isSorting_{false},
     selectionEnabled_{false}, insertionEnabled_{false}, mergeEnabled_{false}, bogoEnabled_{false},
     quickEnabled_{false}, stlSort_Enabled{false}, binarytreeEnabled_{false}, stlHeapEnabled_{false},
     numberOfWorkingThreads_{0}
 {
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(nullptr)));
     ui->setupUi(this);
 
     // Remove bottom right corner grip, because resizing is disabled (min / max window size are equal)
@@ -22,7 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow()
-{ 
+{
+    delete elapsedTimer_;
     delete ui;
 }
 
@@ -42,21 +43,26 @@ void MainWindow::onThreadExit(Algorithm algorithm)
 }
 
 template<typename T>
-std::vector<T> MainWindow::generateRandomData(int length)
+std::vector<T> MainWindow::generateRandomData(unsigned int length)
 {
     std::vector<T> randomData;
     randomData.reserve(length);
 
-    for(int i = 0; i < length; ++i)
+    for(unsigned int i = 0; i < length; ++i)
     {
         randomData.push_back(T(rand() % 100 + 1));
     }
-
     return randomData;
 }
 
 void MainWindow::on_sortButton_clicked()
 {
+    if(isSorting_) { return; }
+
+    isSorting_ = true;
+
+    ui->label_Running->setText(QString::fromStdString(STRING_STARTED));
+
     if(data_.size())
     {
         for(auto& data : data_)
@@ -68,10 +74,10 @@ void MainWindow::on_sortButton_clicked()
         ui->timeTakenList->clear();
     }
 
-    data_.reserve(ui->numOfDataSetSpinBox->value());
+    data_.reserve(static_cast<unsigned int>(ui->numOfDataSetSpinBox->value()));
     for(int i = 0; i < ui->numOfDataSetSpinBox->value(); ++i)
     {
-        data_.push_back(generateRandomData<int>(ui->sizeOfDataSetSpinBox->value()));
+        data_.push_back(generateRandomData<int>(static_cast<unsigned int>(ui->sizeOfDataSetSpinBox->value())));
     }
 
     if(stlSort_Enabled)
@@ -180,15 +186,13 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
     std::string statusText;
     switch (status) {
     case NOT_STARTED:
-        statusText = STATUS_NOT_STARTED;
+        statusText = STRING_STATUS_NOT_STARTED;
         break;
     case IN_PROGRESS:
-        statusText = STATUS_IN_PROGRESS;
+        statusText = STRING_STATUS_IN_PROGRESS;
         break;
     case FINISHED:
-        statusText = STATUS_FINISHED;
-        break;
-    default:
+        statusText = STRING_STATUS_FINISHED;
         break;
     }
 
@@ -217,8 +221,6 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
     case BOGO:
         ui->plabel_Bogo->setText("Bogo Sort: " + QString::fromStdString(statusText));
         break;
-    default:
-        break;
     }
 }
 
@@ -229,8 +231,10 @@ void MainWindow::updateElapsedTime()
         auto time = elapsedTimer_->elapsed();
         ui->label_TimeElapsed->setText("Elapsed time: " + QString::number(time/1000) + " seconds");
     }
-
     t9_.detach();
+    ui->label_TimeElapsed->setText("Elapsed time: 0 seconds");
+    isSorting_ = false;
+    ui->label_Running->setText(QString::fromStdString(STRING_STOPPED));
 }
 
 void MainWindow::on_quickCheckBox_stateChanged(int arg1)

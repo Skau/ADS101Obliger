@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     void updateTimeTakenList(std::string s, double d);
@@ -68,7 +68,7 @@ private:
     Ui::MainWindow *ui;
 
     template <typename T>
-    std::vector<T> generateRandomData(int length);
+    std::vector<T> generateRandomData(unsigned int length);
 
     void sort(Algorithm algorithm);
 
@@ -79,16 +79,18 @@ private:
     std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_, t8_, t9_;
     std::mutex mutex_;
 
-    int numberOfWorkingThreads_;
-
     void updateElapsedTime();
 
-    bool selectionEnabled_, insertionEnabled_, mergeEnabled_, bogoEnabled_,
+    bool isSorting_, selectionEnabled_, insertionEnabled_, mergeEnabled_, bogoEnabled_,
     quickEnabled_, stlSort_Enabled, binarytreeEnabled_, stlHeapEnabled_;
 
-    const std::string STATUS_NOT_STARTED = "Not started";
-    const std::string STATUS_IN_PROGRESS = "In progress";
-    const std::string STATUS_FINISHED = "Finished";
+    int numberOfWorkingThreads_;
+
+    const std::string STRING_STATUS_NOT_STARTED = "Not started";
+    const std::string STRING_STATUS_IN_PROGRESS = "In progress";
+    const std::string STRING_STATUS_FINISHED = "Finished";
+    const std::string STRING_STARTED = "Started";
+    const std::string STRING_STOPPED = "Stopped";
 
     QElapsedTimer* elapsedTimer_;
 };
