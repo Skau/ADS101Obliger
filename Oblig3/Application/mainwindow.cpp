@@ -228,6 +228,7 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
 
 void MainWindow::updateElapsedTime()
 {
+    while(isSorting_ && numberOfWorkingThreads_ > 0)
     {
         auto time = elapsedTimer_->elapsed();
         ui->label_TimeElapsed->setText("Elapsed time: " + QString::number(time/1000) + " seconds");
