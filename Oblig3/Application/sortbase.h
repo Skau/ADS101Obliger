@@ -82,7 +82,7 @@ public:
                         endTime = clock();
                         break;
                     case STL_HEAP:
-                        s = "Heap Sort ";
+                        s = "Heap Sort: ";
                         startTime = clock();
                         HeapSort(dataSet[i]);
                         endTime = clock();
@@ -250,6 +250,8 @@ private:
         auto root = ADS101::btree<int>(data[0]);
         for(unsigned int i = 0; i < data.size(); ++i)
         {
+            if(!checkIfStillRunning())
+                return;
             root.insert(data[i]);
         }
     }

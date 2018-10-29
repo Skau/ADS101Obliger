@@ -31,17 +31,23 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateTimeTakenList(std::string s, double d)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex1_);
 
     ui->timeTakenList->addItem(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
 }
 
 void MainWindow::onThreadExit(Algorithm algorithm)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex2_);
 
     updateLabelStatus(algorithm, FINISHED);
     numberOfWorkingThreads_--;
+}
+
+bool MainWindow::getIsSorting()
+{
+    std::lock_guard<std::mutex> lock(mutex3_);
+    return isSorting_;
 }
 
 template<typename T>

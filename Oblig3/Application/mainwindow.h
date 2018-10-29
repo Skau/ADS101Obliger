@@ -45,7 +45,7 @@ public:
 
     void onThreadExit(Algorithm algorithm);
 
-    bool getIsSorting() { return isSorting_; }
+    bool getIsSorting();
 
 private slots:
     void on_sortButton_clicked();
@@ -81,7 +81,7 @@ private:
     std::vector<std::vector<int>> data_;
 
     std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_, t8_, t9_;
-    std::mutex mutex_;
+    std::mutex mutex1_, mutex2_, mutex3_;
 
     void updateElapsedTime();
 
