@@ -18,72 +18,152 @@ public:
     }
 
     template <typename T>
-    void Sort(std::vector<T*> data, Algorithm algorithm)
+    void Sort(std::vector<std::vector<T*>> dataSet, Algorithm algorithm)
     {
-        if(data.size())
+        for(unsigned int i = 0; i < dataSet.size(); ++i)
         {
-            clock_t startTime, endTime;
-            double duration;
-            switch (algorithm) {
-            case SELECTION:
-                startTime = clock();
-                SelectionSort(data);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Selection Sort: ", duration);
-                break;
-            case INSERTION:
-                startTime = clock();
-                InsertionSort(data);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Insertion Sort: ", duration);
-                break;
-            case MERGE:
-                startTime = clock();
-                MergeSort(data);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Merge Sort: ", duration);
-                break;
-            case QUICK:
+            if(dataSet[i].size())
             {
-                int low = 0;
-                int high = data.size() - 1;
-                startTime = clock();
-                QuickSort(data, low, high);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Quick Sort: ", duration);
-                break;
-            }
-            case STL:
-                startTime = clock();
-                std::sort(data.begin(), data.end());
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("std::Sort: ", duration);
-                break;
-            case BINARY_TREE:
-                startTime = clock();
-                BinarySearchTreeSort(data);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Binary Search Tree Sort: ", duration);
-                break;
-            case HEAP:
-                startTime = clock();
-                HeapSort(data);
-                endTime = clock();
-                duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
-                window_->updateTimeTakenList("Heap Sort: ", duration);
-                break;
-            default:
-                break;
+                clock_t startTime, endTime;
+                double duration;
+                switch (algorithm) {
+                case SELECTION:
+                    startTime = clock();
+                    SelectionSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Selection Sort: ", totalTime);
+                        window_->onThreadExit(SELECTION);
+                        return;
+                    }
+                    break;
+                case INSERTION:
+                    startTime = clock();
+                    InsertionSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Insertion Sort: ", totalTime);
+                        window_->onThreadExit(INSERTION);
+                        return;
+                    }
+                    break;
+                case MERGE:
+                    startTime = clock();
+                    MergeSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Merge Sort: ", totalTime);
+                        window_->onThreadExit(MERGE);
+                        return;
+                    }
+                    break;
+                case QUICK:
+                {
+                    int low = 0;
+                    int high = dataSet[i].size() - 1;
+                    startTime = clock();
+                    QuickSort(dataSet[i], low, high);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Quick Sort: ", totalTime);
+                        window_->onThreadExit(QUICK);
+                        return;
+                    }
+                    break;
+                }
+                case STL_SORT:
+                    startTime = clock();
+                    std::sort(dataSet[i].begin(), dataSet[i].end());
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("std::Sort: ", totalTime);
+                        window_->onThreadExit(STL_SORT);
+                        return;
+                    }
+                    break;
+                case BINARY_TREE:
+                    startTime = clock();
+                    BinarySearchTreeSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Binary Search Tree: ", totalTime);
+                        window_->onThreadExit(BINARY_TREE);
+                        return;
+                    }
+                    break;
+                case STL_HEAP:
+                    startTime = clock();
+                    HeapSort(dataSet[i]);
+                    endTime = clock();
+                    duration = (endTime - startTime) / (double)CLOCKS_PER_SEC;
+                    times_.push_back(duration);
+                    if(i == dataSet.size() -1)
+                    {
+                        double totalTime = 0.0f;
+                        for(auto& duration : times_)
+                        {
+                            totalTime += duration;
+                        }
+                        window_->updateTimeTakenList("Heap Sort: ", totalTime);
+                        window_->onThreadExit(STL_HEAP);
+                        return;
+                    }
+                    break;
+                default:
+                    break;
+                }
             }
         }
 
-        window_->onThreadExit(std::this_thread::get_id(), algorithm);
+        window_->onThreadExit(algorithm);
     }
 
 private:
@@ -201,10 +281,10 @@ private:
     template <typename T>
     void BinarySearchTreeSort(std::vector<T*>& data)
     {
-        auto root = new ADS101::btree<int>(*data[0]);
+        auto root = ADS101::btree<int>(*data[0]);
         for(unsigned int i = 0; i < data.size(); ++i)
         {
-            root->insert(*data[i]);
+            root.insert(*data[i]);
         }
     }
 
@@ -219,7 +299,7 @@ private:
     }
 
     MainWindow* window_;
-    std::mutex mutex_;
+    std::vector<double> times_;
 };
 
 #endif // SORTBASE_H

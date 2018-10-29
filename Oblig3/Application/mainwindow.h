@@ -14,9 +14,9 @@ enum Algorithm
     INSERTION,
     MERGE,
     QUICK,
-    STL,
+    STL_SORT,
     BINARY_TREE,
-    HEAP
+    STL_HEAP
 };
 
 enum Status
@@ -40,7 +40,7 @@ public:
 
     void updateTimeTakenList(std::string s, double d);
 
-    void onThreadExit(std::thread::id id, Algorithm algorithm);
+    void onThreadExit(Algorithm algorithm);
 
 private slots:
     void on_sortButton_clicked();
@@ -51,14 +51,13 @@ private slots:
 
     void on_mergeCheckBox_stateChanged(int arg1);
 
-    void on_heapCheckBox_stateChanged(int arg1);
+    void on_stlHeapCheckBox_stateChanged(int arg1);
 
-    void on_stlCheckBox_stateChanged(int arg1);
+    void on_stlSortCheckBox_stateChanged(int arg1);
 
     void on_binaryTreeCheckBox_stateChanged(int arg1);
 
     void on_selectionCheckBox_stateChanged(int arg1);
-
 
 private:
     Ui::MainWindow *ui;
@@ -70,17 +69,17 @@ private:
 
     void updateLabelStatus(Algorithm algorithm, Status status);
 
-    std::vector<int*> data_;
+    std::vector<std::vector<int*>> data_;
 
     std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_;
-
     std::mutex mutex_;
 
-    bool selection_, insertion_, merge_, quick_, stl_, binarytree_, heap_;
+    bool selectionEnabled_, insertionEnabled_, mergeEnabled_,
+    quickEnabled_, stlSort_Enabled, binarytreeEnabled_, stlHeapEnabled_;
 
-    const std::string STATUS_NOTSTARTED = "not started";
-    const std::string STATUS_PROGRESS = "in progress";
-    const std::string STATUS_FINISHED = "finished";
+    const std::string STATUS_NOT_STARTED = "Not started";
+    const std::string STATUS_IN_PROGRESS = "In progress";
+    const std::string STATUS_FINISHED = "Finished";
 };
 
 #endif // MAINWINDOW_H

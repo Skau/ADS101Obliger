@@ -2,15 +2,19 @@
 #include "ui_mainwindow.h"
 #include "sortbase.h"
 #include <QtDebug>
+#include <QDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    selection_{false}, insertion_{false}, merge_{false},
-    quick_{false}, stl_{false}, binarytree_{false}, heap_{false}
+    selectionEnabled_{false}, insertionEnabled_{false}, mergeEnabled_{false},
+    quickEnabled_{false}, stlSort_Enabled{false}, binarytreeEnabled_{false}, stlHeapEnabled_{false}
 {
     ui->setupUi(this);
-    ui->statusBar->showMessage("Hello");
+
+    // Remove bottom right corner grip, because resizing is disabled (min / max window size are equal)
+    ui->statusBar->setSizeGripEnabled(false);
+
 }
 
 MainWindow::~MainWindow()
@@ -20,6 +24,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateTimeTakenList(std::string s, double d)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     QStringList list;
 
     list.push_back(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
@@ -27,9 +32,9 @@ void MainWindow::updateTimeTakenList(std::string s, double d)
     ui->timeTakenList->addItems(list);
 }
 
-void MainWindow::onThreadExit(std::thread::id id, Algorithm algorithm)
+void MainWindow::onThreadExit(Algorithm algorithm)
 {
-    std::lock_guard<std::mutex> lk(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     updateLabelStatus(algorithm, FINISHED);
 }
 
@@ -51,30 +56,37 @@ void MainWindow::on_sortButton_clicked()
 {
     if(data_.size())
     {
-        for(auto& d : data_)
+        for(auto& data : data_)
         {
-            delete d;
-            d = nullptr;
+            for(auto& d : data)
+            {
+                delete d;
+                d = nullptr;
+            }
+            data.clear();
         }
         data_.clear();
 
         ui->timeTakenList->clear();
     }
 
-    data_ = generateRandomData<int>(ui->sizeSpinBox->value());
-
-    if(stl_)
+    for(int i = 0; i < ui->numOfDataSetSpinBox->value(); ++i)
     {
-        updateLabelStatus(STL, IN_PROGRESS);
-        t1_ = std::thread(&MainWindow::sort, this, STL);
+        data_.push_back(generateRandomData<int>(ui->sizeOfDataSetSpinBox->value()));
+    }
+
+    if(stlSort_Enabled)
+    {
+        updateLabelStatus(STL_SORT, IN_PROGRESS);
+        t1_ = std::thread(&MainWindow::sort, this, STL_SORT);
         t1_.detach();
     }
     else
     {
-        updateLabelStatus(STL, NOT_STARTED);
+        updateLabelStatus(STL_SORT, NOT_STARTED);
     }
 
-    if(quick_)
+    if(quickEnabled_)
     {
         updateLabelStatus(QUICK, IN_PROGRESS);
         t2_ = std::thread(&MainWindow::sort, this, QUICK);
@@ -85,7 +97,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(QUICK, NOT_STARTED);
     }
 
-    if(selection_)
+    if(selectionEnabled_)
     {
         updateLabelStatus(SELECTION, IN_PROGRESS);
         t3_ = std::thread(&MainWindow::sort, this, SELECTION);
@@ -96,7 +108,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(SELECTION, NOT_STARTED);
     }
 
-    if(insertion_)
+    if(insertionEnabled_)
     {
         updateLabelStatus(INSERTION, IN_PROGRESS);
         t4_ = std::thread(&MainWindow::sort, this, INSERTION);
@@ -107,7 +119,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(INSERTION, NOT_STARTED);
     }
 
-    if(merge_)
+    if(mergeEnabled_)
     {
         updateLabelStatus(MERGE, IN_PROGRESS);
         t5_ = std::thread(&MainWindow::sort, this, MERGE);
@@ -118,7 +130,7 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(MERGE, NOT_STARTED);
     }
 
-    if(binarytree_)
+    if(binarytreeEnabled_)
     {
         updateLabelStatus(BINARY_TREE, IN_PROGRESS);
         t6_ = std::thread(&MainWindow::sort, this, BINARY_TREE);
@@ -129,70 +141,28 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(BINARY_TREE, NOT_STARTED);
     }
 
-    if(heap_)
+    if(stlHeapEnabled_)
     {
-        updateLabelStatus(HEAP, IN_PROGRESS);
-        t7_ = std::thread(&MainWindow::sort, this, HEAP);
+        updateLabelStatus(STL_HEAP, IN_PROGRESS);
+        t7_ = std::thread(&MainWindow::sort, this, STL_HEAP);
         t7_.detach();
     }
     else
     {
-        updateLabelStatus(HEAP, NOT_STARTED);
+        updateLabelStatus(STL_HEAP, NOT_STARTED);
     }
-}
-
-void MainWindow::on_quickCheckBox_stateChanged(int arg1)
-{
-    quick_ = arg1;
-}
-
-void MainWindow::on_insertionCheckBox_stateChanged(int arg1)
-{
-    insertion_ = arg1;
-}
-
-void MainWindow::on_mergeCheckBox_stateChanged(int arg1)
-{
-    merge_ = arg1;
-}
-
-void MainWindow::on_heapCheckBox_stateChanged(int arg1)
-{
-    heap_ = arg1;
-}
-
-void MainWindow::on_stlCheckBox_stateChanged(int arg1)
-{
-    stl_ = arg1;
-}
-
-void MainWindow::on_binaryTreeCheckBox_stateChanged(int arg1)
-{
-    binarytree_ = arg1;
-}
-
-void MainWindow::on_selectionCheckBox_stateChanged(int arg1)
-{
-    selection_ = arg1;
-}
-
-void MainWindow::sort(Algorithm algorithm)
-{
-    SortBase sb(this);
-    sb.Sort(data_, algorithm);
 }
 
 void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
 {
 
     std::string statusText;
-
     switch (status) {
     case NOT_STARTED:
-        statusText = STATUS_NOTSTARTED;
+        statusText = STATUS_NOT_STARTED;
         break;
     case IN_PROGRESS:
-        statusText = STATUS_PROGRESS;
+        statusText = STATUS_IN_PROGRESS;
         break;
     case FINISHED:
         statusText = STATUS_FINISHED;
@@ -214,18 +184,57 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
     case QUICK:
         ui->plabel_Quick->setText("Quick Sort: " + QString::fromStdString(statusText));
         break;
-    case STL:
+    case STL_SORT:
         ui->plabel_stdSort->setText("std::Sort: " + QString::fromStdString(statusText));
         break;
     case BINARY_TREE:
         ui->plabel_BT->setText("Binary Tree: " + QString::fromStdString(statusText));
         break;
-    case HEAP:
+    case STL_HEAP:
         ui->plabel_Heap->setText("Heap Sort: " + QString::fromStdString(statusText));
         break;
     default:
         break;
     }
+}
 
+void MainWindow::on_quickCheckBox_stateChanged(int arg1)
+{
+    quickEnabled_ = arg1;
+}
 
+void MainWindow::on_insertionCheckBox_stateChanged(int arg1)
+{
+    insertionEnabled_ = arg1;
+}
+
+void MainWindow::on_mergeCheckBox_stateChanged(int arg1)
+{
+    mergeEnabled_ = arg1;
+}
+
+void MainWindow::on_stlHeapCheckBox_stateChanged(int arg1)
+{
+    stlHeapEnabled_ = arg1;
+}
+
+void MainWindow::on_stlSortCheckBox_stateChanged(int arg1)
+{
+    stlSort_Enabled = arg1;
+}
+
+void MainWindow::on_binaryTreeCheckBox_stateChanged(int arg1)
+{
+    binarytreeEnabled_ = arg1;
+}
+
+void MainWindow::on_selectionCheckBox_stateChanged(int arg1)
+{
+    selectionEnabled_ = arg1;
+}
+
+void MainWindow::sort(Algorithm algorithm)
+{
+    SortBase sb(this);
+    sb.Sort(data_, algorithm);
 }
