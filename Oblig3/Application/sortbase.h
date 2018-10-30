@@ -3,43 +3,47 @@
 
 #include <mainwindow.h>
 
-#include <QDebug>
 #include <algorithm>
-#include <conio.h>
-#include <ctime>
 #include <queue>
-#include "BinaryTree/binarytree.h"
-#include <stdlib.h>
 #include <time.h>
+
+#include "BinaryTree/binarytree.h"
+
+
+// --- Algorithm sorter class --- //
 
 class SortBase
 {
 public:
-    SortBase(MainWindow* window)
+    SortBase(MainWindow* window) : window_{window}
     {
+        // Used by the bogo sort shuffling function
         srand(static_cast<unsigned int>(time(nullptr)));
-        window_ = window;
     }
 
+    // Receives the unsorted data and an enum describing what algorithm to use
     template <typename T>
     void Sort(std::vector<std::vector<T>> dataSet, Algorithm algorithm)
     {
         if(dataSet.size())
         {
+            // Initializes a few variables used by all the algorithms
             clock_t startTime = 0, endTime = 0;
             double duration;
             std::string s;
+            double totalTime = 0;
             for(unsigned int i = 0; i < dataSet.size(); ++i)
             {
+                // This is a regular check throughout to stop the threads if the stop button is pressed
                 if(!checkIfStillRunning())
                 {
                     window_->onThreadExit(algorithm);
                     return;
                 }
 
+                // --- Entry point for all algorithms --- //
                 if(dataSet[i].size())
                 {
-
                     switch (algorithm) {
                     case SELECTION:
                         s = "Selection Sort: ";
@@ -96,15 +100,11 @@ public:
                     }
                 }
 
-                duration = (endTime - startTime) / static_cast<double>(CLOCKS_PER_SEC);
+                // Adds the time used on each dataset to the total time spent
+                totalTime += (endTime - startTime) / static_cast<double>(CLOCKS_PER_SEC);
                 times_.push_back(duration);
             }
-
-            double totalTime = 0;
-            for(auto& duration : times_)
-            {
-                totalTime += duration;
-            }
+            // When done adds this to the list widget
             window_->updateTimeTakenList(s, totalTime);
         }
         window_->onThreadExit(algorithm);
@@ -114,6 +114,26 @@ private:
     MainWindow* window_;
     std::vector<double> times_;
     std::mutex mutex_;
+
+
+    // This check is run through regurarly by all threads (For stop button)
+    bool checkIfStillRunning()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        return window_->getIsRunning();
+    }
+
+    // Utility function used by a few of the algorithms
+    template <typename T>
+    void swap(T* data1, T* data2)
+    {
+        auto temp = *data1;
+        *data1 = *data2;
+        *data2 = temp;
+    }
+
+    // ------ Merge Sort ------ //
 
     template<typename T>
     void merge_sort(std::vector<T>& data, int low, int high)
@@ -130,7 +150,6 @@ private:
           merge(data, low, mid, mid + 1, high);
         }
     }
-
     template<typename T>
     void merge(std::vector<T>& data, int left_low, int left_high, int right_low, int right_high)
     {
@@ -160,6 +179,8 @@ private:
         }
     }
 
+    // ------ Insertion Sort ------ //
+
     template <typename T>
     void InsertionSort(std::vector<T>& data)
     {
@@ -179,13 +200,7 @@ private:
         }
     }
 
-    template <typename T>
-    void swap(T* data1, T* data2)
-    {
-        auto temp = *data1;
-        *data1 = *data2;
-        *data2 = temp;
-    }
+    // ------ Selection Sort ------ //
 
     template <typename T>
     void SelectionSort(std::vector<T>& data)
@@ -208,6 +223,8 @@ private:
         }
     }
 
+    // ------ Quick Sort ------ //
+
     template <typename T>
     void QuickSort(std::vector<T>& data, int low, int high)
     {
@@ -222,7 +239,6 @@ private:
             QuickSort(data, pi + 1, high);
         }
     }
-
     template <typename T>
     int partition(std::vector<T>& data, int low,int high)
     {
@@ -244,6 +260,8 @@ private:
         return i + 1;
     }
 
+    // ------ BST ------ //
+
     template <typename T>
     void BinarySearchTreeSort(std::vector<T>& data)
     {
@@ -255,6 +273,8 @@ private:
             root.insert(data[i]);
         }
     }
+
+    // ------ Heap ------ //
 
     template <typename T>
     void HeapSort(std::vector<T>& data)
@@ -268,6 +288,8 @@ private:
         }
     }
 
+    // ------ Bogo Sort ------ //
+
     template <typename T>
     void BogoSort(std::vector<T>& data)
     {
@@ -278,7 +300,6 @@ private:
             shuffle(data);
         }
     }
-
     template <typename T>
     bool isSorted(std::vector<T>& data, unsigned int n)
     {
@@ -294,7 +315,6 @@ private:
         }
         return true;
     }
-
     template <typename T>
     void shuffle(std::vector<T>& data)
     {
@@ -304,13 +324,6 @@ private:
                 return;
             swap(&data[i], &data[rand()%data.size()]);
         }
-    }
-
-    bool checkIfStillRunning()
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-
-        return window_->getIsSorting();
     }
 };
 

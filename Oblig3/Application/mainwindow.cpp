@@ -1,34 +1,36 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "sortbase.h"
+
 #include <QtDebug>
-#include <QDialog>
 #include <QElapsedTimer>
 
+#include "sortbase.h"
+
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow), isSorting_{false},
-    selectionEnabled_{true}, insertionEnabled_{true}, mergeEnabled_{true}, bogoEnabled_{false},
-    quickEnabled_{true}, stlSort_Enabled{true}, binarytreeEnabled_{true}, stlHeapEnabled_{true},
-    numberOfWorkingThreads_{0}
+    QMainWindow(parent), ui(new Ui::MainWindow),
+    isRunning_{false}, selectionEnabled_{true},insertionEnabled_{true},
+    mergeEnabled_{true}, bogoEnabled_{false}, quickEnabled_{true},
+    stlSort_Enabled{true}, binarytreeEnabled_{true}, stlHeapEnabled_{true},
+    numberOfWorkingThreads_{0}, elapsedTimer_{new QElapsedTimer()}
 {
+    // Used when generating random unsorted data
     srand(static_cast<unsigned int>(time(nullptr)));
+
     ui->setupUi(this);
 
     // Remove bottom right corner grip, because resizing is disabled (min / max window size are equal)
     ui->statusBar->setSizeGripEnabled(false);
-
-    elapsedTimer_ = new QElapsedTimer();
 }
 
 MainWindow::~MainWindow()
 {
-    isSorting_ = false;
+    isRunning_ = false;
 
     delete elapsedTimer_;
     delete ui;
 }
 
+// When an algorithm is finished this will add their name and time to the list widget
 void MainWindow::updateTimeTakenList(std::string s, double d)
 {
     std::lock_guard<std::mutex> lock(mutex1_);
@@ -36,6 +38,7 @@ void MainWindow::updateTimeTakenList(std::string s, double d)
     ui->timeTakenList->addItem(QString::fromStdString(s) + QString().setNum(d, 'g', 6) + " seconds");
 }
 
+// This is the last thing a thread does when it's done
 void MainWindow::onThreadExit(Algorithm algorithm)
 {
     std::lock_guard<std::mutex> lock(mutex2_);
@@ -44,12 +47,17 @@ void MainWindow::onThreadExit(Algorithm algorithm)
     numberOfWorkingThreads_--;
 }
 
-bool MainWindow::getIsSorting()
+// The threads will use this throughout the sorting to see if the stop button is pressed
+bool MainWindow::getIsRunning()
 {
     std::lock_guard<std::mutex> lock(mutex3_);
-    return isSorting_;
+
+    return isRunning_;
 }
 
+// Generates a vector of T with custom length
+// Right now it's set up for ints specifically,
+// each element is a number between 1 and 100
 template<typename T>
 std::vector<T> MainWindow::generateRandomData(unsigned int length)
 {
@@ -65,12 +73,15 @@ std::vector<T> MainWindow::generateRandomData(unsigned int length)
 
 void MainWindow::on_sortButton_clicked()
 {
-    if(isSorting_) { return; }
+    // Check so spamming the button won't do anything
+    if(isRunning_) { return; }
 
-    isSorting_ = true;
+    isRunning_ = true;
 
+    // Updates the status
     ui->label_Running->setText(QString::fromStdString(STRING_STARTED));
 
+    // If this is not the first run, remove all the old sorted data first
     if(data_.size())
     {
         for(auto& data : data_)
@@ -79,14 +90,19 @@ void MainWindow::on_sortButton_clicked()
         }
         data_.clear();
 
+        // Clears algorithm times in the list widget
         ui->timeTakenList->clear();
     }
 
+    // Adds the set number of datasets with the set length to be sorted
     data_.reserve(static_cast<unsigned int>(ui->numOfDataSetSpinBox->value()));
     for(int i = 0; i < ui->numOfDataSetSpinBox->value(); ++i)
     {
         data_.push_back(generateRandomData<int>(static_cast<unsigned int>(ui->sizeOfDataSetSpinBox->value())));
     }
+
+
+    // --- Runs through all the flags and starts the algorithms on a new thread --- //
 
     if(stlSort_Enabled)
     {
@@ -184,10 +200,19 @@ void MainWindow::on_sortButton_clicked()
         updateLabelStatus(BOGO, NOT_STARTED);
     }
 
+    // Starts the GUI timer
     elapsedTimer_->start();
     t9_ = std::thread(&MainWindow::updateElapsedTime, this);
 }
 
+// Each thread makes its own instance of the SortBase class
+void MainWindow::sort(Algorithm algorithm)
+{
+    SortBase sb(this);
+    sb.Sort(data_, algorithm);
+}
+
+// Label status updater
 void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
 {
 
@@ -232,18 +257,30 @@ void MainWindow::updateLabelStatus(Algorithm algorithm, Status status)
     }
 }
 
+// The function the GUI timer thread runs.
 void MainWindow::updateElapsedTime()
 {
-    while(isSorting_ && numberOfWorkingThreads_ > 0)
+    while(isRunning_ && numberOfWorkingThreads_ > 0)
     {
         auto time = elapsedTimer_->elapsed();
         ui->label_TimeElapsed->setText("Elapsed time: " + QString::number(time/1000) + " seconds");
     }
     t9_.detach();
     ui->label_TimeElapsed->setText("Elapsed time: 0 seconds");
-    isSorting_ = false;
+    isRunning_ = false;
     ui->label_Running->setText(QString::fromStdString(STRING_STOPPED));
 }
+
+// Stop button
+void MainWindow::on_stopButton_clicked()
+{
+    if(isRunning_)
+    {
+        isRunning_ = false;
+    }
+}
+
+// --- Algorithm flag checkbox slots --- //
 
 void MainWindow::on_quickCheckBox_stateChanged(int arg1)
 {
@@ -283,18 +320,4 @@ void MainWindow::on_selectionCheckBox_stateChanged(int arg1)
 void MainWindow::on_bogoCheckBox_stateChanged(int arg1)
 {
     bogoEnabled_ = arg1;
-}
-
-void MainWindow::sort(Algorithm algorithm)
-{
-    SortBase sb(this);
-    sb.Sort(data_, algorithm);
-}
-
-void MainWindow::on_stopButton_clicked()
-{
-    if(isSorting_)
-    {
-        isSorting_ = false;
-    }
 }

@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <vector>
 #include <string>
-#include <map>
 #include <thread>
 #include <mutex>
 
@@ -45,7 +44,7 @@ public:
 
     void onThreadExit(Algorithm algorithm);
 
-    bool getIsSorting();
+    bool getIsRunning();
 
 private slots:
     void on_sortButton_clicked();
@@ -69,7 +68,30 @@ private slots:
     void on_stopButton_clicked();
 
 private:
+
+    // --- Variables --- //
+
     Ui::MainWindow *ui;
+
+    std::vector<std::vector<int>> data_;
+
+    std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_, t8_, t9_;
+    std::mutex mutex1_, mutex2_, mutex3_;
+
+    bool isRunning_, selectionEnabled_, insertionEnabled_, mergeEnabled_, bogoEnabled_,
+    quickEnabled_, stlSort_Enabled, binarytreeEnabled_, stlHeapEnabled_;
+
+    int numberOfWorkingThreads_;
+
+    const std::string STRING_STATUS_NOT_STARTED = "Not started";
+    const std::string STRING_STATUS_IN_PROGRESS = "Sorting...";
+    const std::string STRING_STATUS_FINISHED = "Finished";
+    const std::string STRING_STARTED = "Started";
+    const std::string STRING_STOPPED = "Stopped";
+
+    QElapsedTimer* elapsedTimer_;
+
+    // --- Functions --- ///
 
     template <typename T>
     std::vector<T> generateRandomData(unsigned int length);
@@ -78,25 +100,7 @@ private:
 
     void updateLabelStatus(Algorithm algorithm, Status status);
 
-    std::vector<std::vector<int>> data_;
-
-    std::thread t1_, t2_, t3_, t4_, t5_, t6_, t7_, t8_, t9_;
-    std::mutex mutex1_, mutex2_, mutex3_;
-
     void updateElapsedTime();
-
-    bool isSorting_, selectionEnabled_, insertionEnabled_, mergeEnabled_, bogoEnabled_,
-    quickEnabled_, stlSort_Enabled, binarytreeEnabled_, stlHeapEnabled_;
-
-    int numberOfWorkingThreads_;
-
-    const std::string STRING_STATUS_NOT_STARTED = "Not started";
-    const std::string STRING_STATUS_IN_PROGRESS = "In progress";
-    const std::string STRING_STATUS_FINISHED = "Finished";
-    const std::string STRING_STARTED = "Started";
-    const std::string STRING_STOPPED = "Stopped";
-
-    QElapsedTimer* elapsedTimer_;
 };
 
 #endif // MAINWINDOW_H
