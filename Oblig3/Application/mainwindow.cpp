@@ -26,6 +26,16 @@ MainWindow::~MainWindow()
 {
     isRunning_ = false;
 
+    t1_.join();
+    t2_.join();
+    t3_.join();
+    t4_.join();
+    t5_.join();
+    t6_.join();
+    t7_.join();
+    t8_.join();
+    t9_.join();
+
     delete elapsedTimer_;
     delete ui;
 }
